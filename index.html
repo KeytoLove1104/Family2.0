@@ -1,323 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deco Family Insight - Digital Biorhythm</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
-        .pro-badge { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; letter-spacing: 0.05em; text-transform: uppercase; }
-        
-        /* 纯 CSS 动画，不依赖 JS */
-        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-enter { animation: fade-in 0.6s ease-out forwards; }
-        
-        /* 简单的 CSS 饼图实现，替代 Recharts */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* 玻璃拟态卡片效果 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        /* Pro 标签样式 */
+        .pro-badge {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+        }
+        /* CSS 饼图 */
         .css-pie {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            background: conic-gradient(
-                #3b82f6 0% 72%, 
-                #f59e0b 72% 100%
-            );
+            background: conic-gradient(#3b82f6 0% 72%, #f59e0b 72% 100%);
             position: relative;
         }
         .css-pie::after {
-            content: ""; position: absolute; inset: 15%; background: white; border-radius: 50%;
+            content: "";
+            position: absolute;
+            inset: 15%;
+            background: white;
+            border-radius: 50%;
+        }
+        /* 进入动画 */
+        .animate-enter {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body>
-    <div id="root" class="min-h-screen flex items-center justify-center text-slate-400">
-        Loading Deco System...
-    </div>
+<body class="min-h-screen p-4 md:p-8 animate-enter">
 
-    <script type="text/babel">
-        // 简化变量获取
-        const { useState, useEffect } = React;
-
-        // --- 1. SVG 图标组件 (内置，不依赖外部请求) ---
-        const Icon = ({ d, color = "currentColor", size = 18, className = "" }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d={d} />
-            </svg>
-        );
-
-        // 图标路径定义
-        const paths = {
-            sun: "M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z",
-            moon: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z",
-            users: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75",
-            clock: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z M12 6v6l4 2", // Shield style clock
-            sparkles: "m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z",
-            zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
-            lock: "M7 11V7a5 5 0 0 1 10 0v4 M5 11h14v10H5z",
-            check: "M20 6L9 17l-5-5",
-            menu: "M3 12h18M3 6h18M3 18h18"
-        };
-
-        // --- 2. 核心组件 ---
+    <div class="max-w-6xl mx-auto">
         
-        // 模拟的波形图 (SVG Path)，绝对稳定
-        const StaticWaveChart = () => (
-            <div className="w-full h-32 relative mt-4 overflow-hidden">
-                <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="w-full h-full text-blue-500 opacity-20">
-                    <path d="M0 40 V 30 Q 10 25 20 35 T 40 30 T 60 10 T 80 25 T 100 20 V 40 Z" fill="currentColor" />
-                </svg>
-                <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="w-full h-full text-amber-500 opacity-20 absolute top-0 left-0">
-                    <path d="M0 40 V 35 Q 15 38 30 20 T 50 25 T 70 35 T 100 30 V 40 Z" fill="currentColor" />
-                </svg>
-                {/* Lines */}
-                <div className="absolute top-0 left-0 w-full h-full flex justify-between px-2">
-                    {[...Array(7)].map((_, i) => (
-                        <div key={i} className="h-full w-[1px] bg-slate-100 border-dashed border-l border-slate-200"></div>
-                    ))}
-                </div>
-                <div className="absolute bottom-0 w-full flex justify-between text-[10px] text-slate-400 px-1">
-                    <span>6am</span><span>9am</span><span>12pm</span><span>3pm</span><span>6pm</span><span>9pm</span><span>12am</span>
+        <header class="flex justify-between items-center mb-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-slate-200">D</div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight leading-none">Deco</h1>
+                    <span class="text-sm text-slate-400 font-medium">Family Insight</span>
                 </div>
             </div>
-        );
+            <div class="flex gap-6 text-sm font-semibold text-slate-400">
+                <span class="text-slate-900 cursor-pointer border-b-2 border-slate-900 pb-1">Overview</span>
+                <span class="hover:text-slate-600 cursor-pointer hidden sm:inline transition-colors">History</span>
+                <span class="hover:text-slate-600 cursor-pointer transition-colors">Settings</span>
+            </div>
+        </header>
 
-        const MemberCard = ({ member }) => (
-            <div className="glass-card p-4 rounded-xl relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
-                <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: member.color }}></div>
-                <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
-                        <img src={`https://api.dicebear.com/9.x/notionists/svg?seed=${member.name}`} alt="avatar" className="w-full h-full" />
+        <section class="mb-10">
+            <div class="flex items-end justify-between mb-4 px-1">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Today's Pulse</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800 tracking-tight">Healthy & Balanced</h2>
+                    <p class="text-slate-500 text-sm mt-1 max-w-xl">今日数字生物钟显示工作与生活平衡良好。高峰用网时段与家庭时间高度重合。</p>
+                </div>
+                <div class="hidden md:block text-right">
+                    <div class="text-3xl font-bold text-slate-700">18.5 GB</div>
+                    <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Data Flow</div>
+                </div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+                <div class="flex justify-between text-xs font-bold text-slate-400 mb-4 uppercase tracking-wide relative z-10">
+                    <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-blue-500"></div> Focus / Work</span>
+                    <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-amber-500"></div> Chill / Media</span>
+                </div>
+                
+                <div class="w-full h-32 relative">
+                    <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="w-full h-full text-blue-500 opacity-20 absolute top-0 left-0">
+                        <path d="M0 40 V 30 Q 15 10 30 35 T 60 20 T 100 38 V 40 Z" fill="currentColor" />
+                    </svg>
+                    <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="w-full h-full text-amber-500 opacity-20 absolute top-0 left-0">
+                        <path d="M0 40 V 38 Q 20 40 40 25 T 80 15 T 100 30 V 40 Z" fill="currentColor" />
+                    </svg>
+                    <div class="absolute top-0 left-0 w-full h-full flex justify-between px-2 pointer-events-none">
+                        <div class="h-full w-px border-l border-dashed border-slate-200"></div>
+                        <div class="h-full w-px border-l border-dashed border-slate-200"></div>
+                        <div class="h-full w-px border-l border-dashed border-slate-200"></div>
+                        <div class="h-full w-px border-l border-dashed border-slate-200"></div>
+                        <div class="h-full w-px border-l border-dashed border-slate-200"></div>
+                        <div class="h-full w-px border-l border-dashed border-slate-200"></div>
+                        <div class="h-full w-px border-l border-dashed border-slate-200"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 mt-2 font-mono">
+                    <span>06:00</span><span>09:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span><span>00:00</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-10">
+            <div class="flex items-center gap-2 mb-4 px-1">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <h3 class="text-lg font-bold text-slate-700">Digital Personas <span class="text-sm font-normal text-slate-400">(AI Inferred)</span></h3>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <div class="glass-card p-4 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform duration-300">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Arthur" alt="avatar" />
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800 text-sm">Arthur</div>
+                            <div class="text-[10px] text-slate-400 uppercase font-semibold">Dad / Admin</div>
+                        </div>
+                    </div>
+                    <span class="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded mb-2 border border-slate-200">Info Hunter</span>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-3 line-clamp-2">High consumption of News & Finance. Consistent routine.</p>
+                    <div class="text-[10px] text-slate-400 flex items-center gap-1">
+                        <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active: 07:00 - 22:30
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform duration-300">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-pink-500"></div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Molly" alt="avatar" />
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800 text-sm">Molly</div>
+                            <div class="text-[10px] text-slate-400 uppercase font-semibold">Mom / Manager</div>
+                        </div>
+                    </div>
+                    <span class="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded mb-2 border border-slate-200">Social Connector</span>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-3 line-clamp-2">Balanced mix of Social & Shopping. Evening relaxation peak.</p>
+                    <div class="text-[10px] text-slate-400 flex items-center gap-1">
+                        <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active: 08:30 - 23:00
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform duration-300">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Kevin" alt="avatar" />
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800 text-sm">Kevin</div>
+                            <div class="text-[10px] text-slate-400 uppercase font-semibold">Son / User</div>
+                        </div>
+                    </div>
+                    <span class="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded mb-2 border border-slate-200">Virtual Explorer</span>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-3 line-clamp-2">High bandwidth gaming & video. Late night activity detected.</p>
+                    <div class="text-[10px] text-slate-400 flex items-center gap-1">
+                        <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active: 16:00 - 01:00
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 rounded-xl relative overflow-hidden hover:-translate-y-1 transition-transform duration-300">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Timmy" alt="avatar" />
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800 text-sm">Timmy</div>
+                            <div class="text-[10px] text-slate-400 uppercase font-semibold">Kid / Child</div>
+                        </div>
+                    </div>
+                    <span class="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded mb-2 border border-slate-200">Digital Learner</span>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-3 line-clamp-2">Strictly educational & kids content. Healthy limits.</p>
+                    <div class="text-[10px] text-slate-400 flex items-center gap-1">
+                        <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active: 17:00 - 20:00
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+            
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex justify-between mb-6">
+                    <h3 className="font-bold text-slate-700">Balance</h3>
+                    <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded">WEEKLY</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="w-24 h-24 shrink-0">
+                        <div class="css-pie"></div>
                     </div>
                     <div>
-                        <div className="font-bold text-slate-800 text-sm">{member.name}</div>
-                        <div className="text-[10px] text-slate-400 uppercase font-semibold">{member.role}</div>
-                    </div>
-                </div>
-                <span className="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded mb-2 border border-slate-200">
-                    {member.type}
-                </span>
-                <p className="text-xs text-slate-500 leading-relaxed mb-2 line-clamp-2">
-                    {member.desc}
-                </p>
-                <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active: {member.activeHours}
-                </div>
-            </div>
-        );
-
-        const SyncItem = ({ pair, score }) => (
-            <div className="flex items-center gap-3 mb-3 last:mb-0">
-                <div className="flex -space-x-2 shrink-0">
-                    <div className="w-8 h-8 rounded-full bg-white border border-slate-200 overflow-hidden">
-                        <img src={`https://api.dicebear.com/9.x/notionists/svg?seed=${pair[0]}`} />
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-white border border-slate-200 overflow-hidden">
-                        <img src={`https://api.dicebear.com/9.x/notionists/svg?seed=${pair[1]}`} />
-                    </div>
-                </div>
-                <div className="flex-1">
-                    <div className="flex justify-between mb-1">
-                        <span className="text-xs font-bold text-slate-700">Sync Rate</span>
-                        <span className="text-xs font-mono text-slate-500">{score}%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-1.5">
-                        <div 
-                            className="h-1.5 rounded-full" 
-                            style={{ width: `${score}%`, backgroundColor: score > 80 ? '#10b981' : '#f59e0b' }}
-                        ></div>
+                        <div class="text-3xl font-bold text-slate-800">72%</div>
+                        <div class="text-xs text-slate-400 uppercase font-bold tracking-wide mb-2">Focus Score</div>
+                        <p className="text-xs text-slate-500 leading-snug">Productivity apps usage increased by 20%.</p>
                     </div>
                 </div>
             </div>
-        );
 
-        // --- 主程序 ---
-        const App = () => {
-            // Mock Data
-            const data = {
-                pulse: "Healthy & Balanced",
-                desc: "Today's digital biorhythm shows a balanced work-life split. Peak usage aligned with family time.",
-                traffic: "18.5 GB",
-                members: [
-                    { id: 1, name: "Arthur", role: "Dad", type: "Info Hunter", desc: "High consumption of News & Finance apps.", activeHours: "07:00 - 22:30", color: "#3b82f6" },
-                    { id: 2, name: "Molly", role: "Mom", type: "Social Connector", desc: "Balanced mix of Social & Shopping.", activeHours: "08:30 - 23:00", color: "#ec4899" },
-                    { id: 3, name: "Kevin", role: "Teen", type: "Virtual Explorer", desc: "Gaming & HD Video focus. Late active hours.", activeHours: "16:00 - 01:00", color: "#8b5cf6" },
-                    { id: 4, name: "Timmy", role: "Kid", type: "Digital Learner", desc: "Educational content. Strictly filtered.", activeHours: "17:00 - 20:00", color: "#10b981" }
-                ],
-                timeline: [
-                    { t: "06:45", e: "First Online", u: "Dad", icon: "sun", bg: "bg-orange-100 text-orange-600" },
-                    { t: "09:00", e: "Focus Mode", u: "Family", icon: "zap", bg: "bg-blue-100 text-blue-600" },
-                    { t: "19:30", e: "Traffic Peak", u: "Living Room", icon: "check", bg: "bg-rose-100 text-rose-600" },
-                    { t: "23:15", e: "All Offline", u: "System", icon: "moon", bg: "bg-indigo-100 text-indigo-600" }
-                ]
-            };
-
-            return (
-                <div className="max-w-6xl mx-auto p-4 md:p-8 animate-enter">
-                    {/* Header */}
-                    <header className="flex justify-between items-center mb-8">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-slate-200">D</div>
-                            <div>
-                                <h1 className="text-xl font-bold text-slate-800 tracking-tight leading-none">Deco</h1>
-                                <span className="text-sm text-slate-400 font-medium">Family Insight</span>
-                            </div>
-                        </div>
-                        <div className="flex gap-4 text-sm font-semibold text-slate-400">
-                            <span className="text-slate-900 cursor-pointer">Overview</span>
-                            <span className="hover:text-slate-600 cursor-pointer hidden sm:inline">History</span>
-                            <span className="hover:text-slate-600 cursor-pointer">Settings</span>
-                        </div>
-                    </header>
-
-                    {/* 1. Daily Pulse */}
-                    <section className="mb-10">
-                        <div className="flex items-end justify-between mb-4 px-1">
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Today's Pulse</span>
-                                </div>
-                                <h2 className="text-2xl md:text-3xl font-bold text-slate-800">{data.pulse}</h2>
-                                <p className="text-slate-500 text-sm mt-1 max-w-xl">{data.desc}</p>
-                            </div>
-                            <div className="hidden md:block text-right">
-                                <div className="text-3xl font-bold text-slate-700">{data.traffic}</div>
-                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Data</div>
-                            </div>
-                        </div>
-                        
-                        {/* Chart Container */}
-                        <div className="glass-card rounded-2xl p-6 shadow-sm">
-                            <div className="flex justify-between text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">
-                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-blue-500"></div> Focus / Work</span>
-                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500"></div> Chill / Media</span>
-                            </div>
-                            <StaticWaveChart />
-                        </div>
-                    </section>
-
-                    {/* 2. Digital Personas */}
-                    <section className="mb-10">
-                        <div className="flex items-center gap-2 mb-4 px-1">
-                            <Icon d={paths.users} className="text-slate-400" />
-                            <h3 className="text-lg font-bold text-slate-700">Digital Personas</h3>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {data.members.map(m => <MemberCard key={m.id} member={m} />)}
-                        </div>
-                    </section>
-
-                    {/* 3. Stats Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-                        
-                        {/* Life/Tech Balance (CSS Pie Chart) */}
-                        <div className="glass-card rounded-2xl p-6">
-                            <div className="flex justify-between mb-6">
-                                <h3 className="font-bold text-slate-700">Balance</h3>
-                                <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded">WEEKLY</span>
-                            </div>
-                            <div className="flex items-center gap-6">
-                                <div className="w-24 h-24 shrink-0">
-                                    <div className="css-pie"></div>
-                                </div>
-                                <div>
-                                    <div className="text-3xl font-bold text-slate-800">72%</div>
-                                    <div className="text-xs text-slate-400 uppercase font-bold tracking-wide mb-2">Focus Score</div>
-                                    <p className="text-xs text-slate-500 leading-snug">Productivity apps usage increased by 20%.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Sync Rate */}
-                        <div className="glass-card rounded-2xl p-6 lg:col-span-2">
-                             <div className="flex justify-between mb-4">
-                                <h3 className="font-bold text-slate-700 flex items-center gap-2">
-                                    <Icon d={paths.sparkles} className="text-purple-500" /> Family Sync
-                                </h3>
-                                <button className="text-xs text-slate-400 hover:text-slate-600 font-bold">View All</button>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <SyncItem pair={["Arthur", "Molly"]} score={85} />
-                                <SyncItem pair={["Arthur", "Kevin"]} score={32} />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 4. Timeline & Weekly Insight */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Timeline */}
-                        <div className="glass-card rounded-2xl p-6 border-l-4 border-l-blue-500">
-                            <h3 className="font-bold text-slate-700 mb-6 flex items-center gap-2">
-                                <Icon d={paths.clock} /> Daily Timeline
-                            </h3>
-                            <div className="relative pl-4 space-y-6">
-                                <div className="absolute left-[23px] top-2 bottom-2 w-0.5 bg-slate-100"></div>
-                                {data.timeline.map((item, i) => (
-                                    <div key={i} className="relative flex items-center gap-4 z-10">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 border-white shadow-sm ${item.bg}`}>
-                                            <Icon d={paths[item.icon]} size={14} />
-                                        </div>
-                                        <div>
-                                            <div className="text-[10px] font-mono text-slate-400 font-bold">{item.t}</div>
-                                            <div className="text-sm font-bold text-slate-700">{item.e}</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Weekly Insight (Pro) */}
-                        <div className="lg:col-span-2 rounded-2xl p-8 bg-gradient-to-br from-slate-800 to-slate-900 text-white relative overflow-hidden">
-                            {/* Decorative Background */}
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-                            
-                            <div className="flex justify-between items-start mb-6 relative z-10">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                                        <Icon d={paths.sparkles} className="text-yellow-400" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg">Weekly Insight Letter</h3>
-                                        <p className="text-slate-400 text-xs">AI Generated • Just now</p>
-                                    </div>
-                                </div>
-                                <div className="pro-badge shadow-lg shadow-indigo-500/30">PRO</div>
-                            </div>
-                            
-                            <div className="space-y-4 text-sm text-slate-300 font-light leading-relaxed relative z-10">
-                                <p><strong className="text-white font-medium">Dear Administrator,</strong></p>
-                                <p>Your family digital biorhythm is <span className="text-emerald-400 font-medium">remarkably stable</span> this week. We noticed a <strong>20% increase</strong> in educational traffic from Timmy—great focus!</p>
-                                <p>However, there is a slight <span className="text-amber-400 font-medium">desynchronization</span> between you and Kevin. His peak hours shifted to 01:00 AM. Consider checking his sleep schedule.</p>
-                            </div>
-
-                            <div className="mt-8 pt-6 border-t border-white/10 flex gap-4 relative z-10">
-                                <button className="px-4 py-2 bg-white text-slate-900 rounded-lg text-xs font-bold hover:bg-slate-200 transition">
-                                    Apply Bedtime Mode
-                                </button>
-                                <button className="px-4 py-2 bg-white/5 text-white rounded-lg text-xs font-bold hover:bg-white/10 transition">
-                                    Full Report
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <footer className="mt-12 text-center text-xs text-slate-400 pb-8 font-medium">
-                        <p>Deco HomeShield Pro • Privacy Protected • 2024</p>
-                    </footer>
+            <div class="glass-card rounded-2xl p-6 lg:col-span-2">
+                 <div class="flex justify-between mb-4">
+                    <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-500"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg> 
+                        Family Sync Rate
+                    </h3>
+                    <button class="text-xs text-slate-400 hover:text-slate-600 font-bold">View History &rarr;</button>
                 </div>
-            );
-        };
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex items-center gap-3">
+                        <div class="flex -space-x-2 shrink-0">
+                            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Arthur" class="w-8 h-8 rounded-full bg-white border border-slate-200" />
+                            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Molly" class="w-8 h-8 rounded-full bg-white border border-slate-200" />
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs font-bold text-slate-700">Sync Partners</span>
+                                <span class="text-xs font-mono text-slate-500">85%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5">
+                                <div class="h-1.5 rounded-full bg-emerald-500" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex -space-x-2 shrink-0">
+                            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Arthur" class="w-8 h-8 rounded-full bg-white border border-slate-200" />
+                            <img src="https://api.dicebear.com/9.x/notionists/svg?seed=Kevin" class="w-8 h-8 rounded-full bg-white border border-slate-200" />
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs font-bold text-slate-700">Diff Timezones</span>
+                                <span class="text-xs font-mono text-slate-500">32%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5">
+                                <div class="h-1.5 rounded-full bg-amber-500" style="width: 32%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="glass-card rounded-2xl p-6 border-l-4 border-l-blue-500">
+                <h3 class="font-bold text-slate-700 mb-6 flex items-center gap-2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Daily Timeline
+                </h3>
+                <div class="relative pl-4 space-y-6">
+                    <div class="absolute left-[15px] top-2 bottom-2 w-0.5 bg-slate-100"></div>
+                    
+                    <div class="relative flex items-center gap-4 z-10">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 border-white shadow-sm bg-orange-100 text-orange-600">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-mono text-slate-400 font-bold">06:45</div>
+                            <div class="text-sm font-bold text-slate-700">First Online</div>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center gap-4 z-10">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 border-white shadow-sm bg-blue-100 text-blue-600">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-mono text-slate-400 font-bold">09:00</div>
+                            <div class="text-sm font-bold text-slate-700">Focus Mode</div>
+                        </div>
+                    </div>
+                     <div class="relative flex items-center gap-4 z-10">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 border-white shadow-sm bg-indigo-100 text-indigo-600">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-mono text-slate-400 font-bold">23:15</div>
+                            <div class="text-sm font-bold text-slate-700">All Offline</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 rounded-2xl p-8 bg-slate-900 text-white relative overflow-hidden flex flex-col justify-between">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+
+                <div>
+                    <div class="flex justify-between items-start mb-6 relative z-10">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-yellow-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Weekly Insight Letter</h3>
+                                <p class="text-slate-400 text-xs">AI Generated • Just now</p>
+                            </div>
+                        </div>
+                        <div class="pro-badge shadow-lg shadow-indigo-500/30">PRO</div>
+                    </div>
+                    
+                    <div class="space-y-4 text-sm text-slate-300 font-light leading-relaxed relative z-10">
+                        <p><strong class="text-white font-medium">Dear Administrator,</strong></p>
+                        <p>Your family digital biorhythm is <span class="text-emerald-400 font-medium">remarkably stable</span> this week. We noticed a <strong>20% increase</strong> in educational traffic from Timmy—great focus!</p>
+                        <p>However, there is a slight <span class="text-amber-400 font-medium">desynchronization</span> between you and Kevin. His peak hours shifted to 01:00 AM. Consider checking his sleep schedule.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-white/10 flex gap-4 relative z-10">
+                    <button class="px-4 py-2 bg-white text-slate-900 rounded-lg text-xs font-bold hover:bg-slate-200 transition">
+                        Apply Bedtime Mode
+                    </button>
+                    <button class="px-4 py-2 bg-white/5 text-white rounded-lg text-xs font-bold hover:bg-white/10 transition">
+                        Full Report
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-xs text-slate-400 pb-8 font-medium">
+            <p>Deco HomeShield Pro • Privacy Protected • 2024</p>
+        </footer>
+
+    </div>
+
 </body>
 </html>
