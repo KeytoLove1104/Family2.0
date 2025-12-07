@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deco Family Rhythm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body { background-color: #F8FAFC; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .card { background: white; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } = Recharts;
+        const { Activity, Brain, Heart, Zap, Clock, ShieldCheck, User, Users, MoreHorizontal, ArrowUpRight } = lucide;
+
+        // --- Mock Data ---
+        const USERS = [
+            { id: 1, name: "Arthur (Dad)", role: "Admin", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Arthur", color: "#3B82F6", tags: ["Info Hunter", "Night Thinker"] },
+            { id: 2, name: "Molly (Mom)", role: "Member", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Molly", color: "#EC4899", tags: ["Social Butterfly", "Early Bird"] },
+            { id: 3, name: "Timmy (Kid)", role: "Member", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Timmy", color: "#F59E0B", tags: ["Virtual Explorer", "Focus Growing"] }
+        ];
+
+        const PULSE_DATA = [
+            { time: '06:00', Dad: 10, Mom: 0, Kid: 0 },
+            { time: '09:00', Dad: 50, Mom: 80, Kid: 20 },
+            { time: '12:00', Dad: 30, Mom: 40, Kid: 0 },
+            { time: '15:00', Dad: 60, Mom: 30, Kid: 100 },
+            { time: '18:00', Dad: 20, Mom: 90, Kid: 150 },
+            { time: '21:00', Dad: 120, Mom: 100, Kid: 40 },
+            { time: '24:00', Dad: 80, Mom: 20, Kid: 0 },
+        ];
+
+        const BALANCE_DATA = [
+            { name: 'Productivity/Focus', value: 35, color: '#10B981' }, // Green
+            { name: 'Entertainment', value: 50, color: '#6366F1' }, // Indigo
+            { name: 'System/Other', value: 15, color: '#94A3B8' }, // Slate
+        ];
+
+        const TIMELINE_EVENTS = [
+            { time: "06:45", icon: "sun", title: "Network Wake Up", desc: "First device online (Molly's iPhone)" },
+            { time: "09:30", icon: "briefcase", title: "Focus Mode Active", desc: "Dad started Zoom Meeting (High Priority)" },
+            { time: "16:20", icon: "gamepad", title: "Entertainment Spike", desc: "Timmy started Roblox" },
+            { time: "20:00", icon: "tv", title: "Family Sync", desc: "Multiple devices streaming video simultaneously" },
+            { time: "23:15", icon: "moon", title: "Wind Down", desc: "Most devices idle. Good night!" }
+        ];
+
+        // --- Components ---
+
+        const Header = () => (
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Family Rhythm</h1>
+                    <p className="text-sm text-slate-500 font-medium mt-1">Deco HomeShield • Pro Enabled</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <span className="text-xs font-semibold bg-green-100 text-green-700 px-2 py-1 rounded-full border border-green-200 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                        Network Healthy
+                    </span>
+                    <img src={USERS[0].avatar} className="w-8 h-8 rounded-full bg-slate-200 border border-slate-300" />
+                </div>
+            </div>
+        );
+
+        const PulseCard = () => (
+            <div className="card p-6 mb-6">
+                <div className="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Today's Heartbeat</h3>
+                        <div className="text-xl font-bold text-slate-800">Productive Morning, Relaxed Evening</div>
+                    </div>
+                    <Activity className="text-slate-400 w-5 h-5" />
+                </div>
+                <div className="h-64 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={PULSE_DATA} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="colorDad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.2}/>
+                                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                                </linearGradient>
+                                <linearGradient id="colorMom" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#EC4899" stopOpacity={0.2}/>
+                                    <stop offset="95%" stopColor="#EC4899" stopOpacity={0}/>
+                                </linearGradient>
+                            </defs>
+                            <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94A3B8'}} />
+                            <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94A3B8'}} />
+                            <Tooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                            <Area type="monotone" dataKey="Dad" stackId="1" stroke="#3B82F6" fill="url(#colorDad)" strokeWidth={2} />
+                            <Area type="monotone" dataKey="Mom" stackId="1" stroke="#EC4899" fill="url(#colorMom)" strokeWidth={2} />
+                            <Area type="monotone" dataKey="Kid" stackId="1" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.1} strokeWidth={2} />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+        );
+
+        const InsightCard = () => (
+            <div className="card bg-slate-800 text-white p-6 mb-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
+                    <Brain size={120} />
+                </div>
+                <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="w-2 h-2 bg-teal-400 rounded-full animate-ping"></div>
+                        <h3 className="text-teal-400 text-xs font-bold uppercase tracking-wider">AI Insight • Weekly Briefing</h3>
+                    </div>
+                    <p className="text-slate-200 text-sm leading-relaxed mb-4">
+                        "Good evening, Arthur. This week, the family maintained a <strong>healthy 70/30 balance</strong> between leisure and productivity. 
+                        We noticed Timmy's online class stability improved significantly after the QoS adjustment on Tuesday. 
+                        Your 'Night Owl' usage has decreased, which aligns with your goal of better sleep hygiene."
+                    </p>
+                    <button className="text-xs bg-white/10 hover:bg-white/20 transition px-3 py-1.5 rounded text-white font-medium flex items-center gap-2">
+                        View Full Report <ArrowUpRight size={14} />
+                    </button>
+                </div>
+            </div>
+        );
+
+        const ArchetypeCard = ({ user }) => (
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-center gap-4 hover:border-slate-200 transition">
+                <div className="relative">
+                    <img src={user.avatar} className="w-12 h-12 rounded-full bg-white border-2 border-white shadow-sm" />
+                    <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+                        <div className="w-3 h-3 rounded-full" style={{backgroundColor: user.color}}></div>
+                    </div>
+                </div>
+                <div>
+                    <h4 className="font-bold text-slate-700 text-sm">{user.name}</h4>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                        {user.tags.map(tag => (
+                            <span key={tag} className="text-[10px] px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-500 font-medium">
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+
+        const BalanceCard = () => (
+            <div className="card p-6 h-full">
+                <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-4">Life/Digital Balance</h3>
+                <div className="h-40 relative">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={BALANCE_DATA}
+                                innerRadius={40}
+                                outerRadius={60}
+                                paddingAngle={5}
+                                dataKey="value"
+                            >
+                                {BALANCE_DATA.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                            </Pie>
+                        </PieChart>
+                    </ResponsiveContainer>
+                    <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
+                        <span className="text-2xl font-bold text-slate-700">35%</span>
+                        <span className="text-[10px] text-slate-400 uppercase">Focus</span>
+                    </div>
+                </div>
+                <div className="space-y-2 mt-2">
+                    {BALANCE_DATA.map(item => (
+                        <div key={item.name} className="flex justify-between items-center text-xs">
+                            <span className="flex items-center gap-2 text-slate-600">
+                                <span className="w-2 h-2 rounded-full" style={{backgroundColor: item.color}}></span>
+                                {item.name}
+                            </span>
+                            <span className="font-bold text-slate-800">{item.value}%</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const SyncCard = () => (
+             <div className="card p-6 h-full">
+                <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-4">Parental Sync</h3>
+                <div className="flex items-center justify-between mb-2">
+                    <div className="flex -space-x-2">
+                        <img src={USERS[0].avatar} className="w-8 h-8 rounded-full border-2 border-white bg-slate-100" />
+                        <img src={USERS[1].avatar} className="w-8 h-8 rounded-full border-2 border-white bg-slate-100" />
+                    </div>
+                    <span className="text-xl font-bold text-indigo-600">85%</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-2 mb-4">
+                    <div className="bg-indigo-500 h-2 rounded-full" style={{width: '85%'}}></div>
+                </div>
+                <p className="text-xs text-slate-500 leading-snug">
+                    You and Molly shared <strong>4 hours</strong> of synchronized offline time this evening. Great for family bonding.
+                </p>
+            </div>
+        );
+
+        const TimelineCard = () => (
+            <div className="card p-6">
+                <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-6">Daily Timeline</h3>
+                <div className="space-y-6 relative border-l-2 border-slate-100 ml-2 pl-6">
+                    {TIMELINE_EVENTS.map((event, idx) => (
+                        <div key={idx} className="relative">
+                            <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-white border-2 border-slate-300"></div>
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h4 className="text-sm font-bold text-slate-700">{event.title}</h4>
+                                    <p className="text-xs text-slate-500 mt-0.5">{event.desc}</p>
+                                </div>
+                                <span className="text-xs font-mono text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded">{event.time}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            React.useEffect(() => {
+                lucide.createIcons();
+            }, []);
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen bg-slate-50 pb-10 sm:max-w-2xl md:max-w-4xl lg:max-w-5xl md:p-8">
+                    {/* Mobile Container Simulation */}
+                    <div className="bg-[#F8FAFC] min-h-screen md:bg-white md:rounded-[2rem] md:shadow-xl md:min-h-[800px] md:overflow-hidden md:border md:border-slate-100">
+                        
+                        {/* Top Bar Background */}
+                        <div className="h-48 bg-gradient-to-b from-white to-[#F8FAFC] p-6 pb-0">
+                            <Header />
+                        </div>
+
+                        <div className="px-6 -mt-10 relative z-10 space-y-6">
+                            
+                            {/* 1. Daily Pulse & AI Insight */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <InsightCard />
+                                <PulseCard />
+                            </div>
+
+                            {/* 2. Digital Archetypes */}
+                            <div>
+                                <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-3 ml-1">Family Members</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {USERS.map(u => <ArchetypeCard key={u.id} user={u} />)}
+                                </div>
+                            </div>
+
+                            {/* 3. Metrics Grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <BalanceCard />
+                                <SyncCard />
+                            </div>
+
+                            {/* 4. Timeline */}
+                            <TimelineCard />
+
+                            {/* 5. Footer */}
+                            <div className="text-center pt-4 pb-8">
+                                <button className="text-slate-400 text-xs font-medium hover:text-slate-600 transition">
+                                    Manage Subscription & Settings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
