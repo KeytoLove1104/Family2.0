@@ -3,424 +3,436 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Vibe - A/B Demo</title>
+    <title>Family Insight - A/B Demo</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #e2e8f0; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Smooth transition for vibe section */
-        #vibeSection { transition: all 0.5s ease; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         /* Glassmorphism utils */
-        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+        .glass-dark { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); }
         
-        /* Modal Animation */
-        .modal-enter { opacity: 0; transform: scale(0.95); }
-        .modal-enter-active { opacity: 1; transform: scale(1); transition: all 0.2s ease-out; }
-        .modal-exit { opacity: 1; transform: scale(1); }
-        .modal-exit-active { opacity: 0; transform: scale(0.95); transition: all 0.2s ease-in; }
+        /* Animation */
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center py-10">
+<body class="flex items-center justify-center min-h-screen py-10 relative">
 
-    <div class="fixed top-6 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl z-50 flex items-center gap-4 border border-slate-600">
-        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">View Mode:</span>
-        <div class="flex bg-slate-900 rounded-lg p-1">
-            <button onclick="switchMode('traffic')" id="btnTraffic" class="px-4 py-1.5 rounded-md text-sm font-bold bg-indigo-500 text-white transition-all shadow-lg">
-                Plan A (Traffic)
+    <div class="fixed top-6 left-6 z-50 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64">
+        <h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Leader View Control</h3>
+        <div class="space-y-2">
+            <button onclick="switchMode('A')" id="btnA" class="w-full py-2 px-4 rounded-lg text-sm font-bold transition-all bg-indigo-600 text-white shadow-md">
+                Plan A: Traffic View (流量)
             </button>
-            <button onclick="switchMode('time')" id="btnTime" class="px-4 py-1.5 rounded-md text-sm font-bold text-slate-400 hover:text-white transition-all">
-                Plan B (Time)
+            <button onclick="switchMode('B')" id="btnB" class="w-full py-2 px-4 rounded-lg text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+                Plan B: Time View (时长)
             </button>
         </div>
+        <p class="text-[10px] text-slate-400 mt-3 leading-tight">
+            * Toggles Section 1 Chart & Data.<br>
+            * Sections 2-6 remain static.
+        </p>
     </div>
-
-    <div class="w-full max-w-[400px] h-[850px] bg-slate-50 shadow-2xl rounded-[3rem] overflow-hidden relative border-8 border-slate-900 ring-4 ring-slate-200/50">
+    <div class="w-full max-w-[400px] bg-slate-50 h-[850px] rounded-[40px] shadow-2xl overflow-hidden border-[8px] border-slate-900 relative flex flex-col">
         
-        <div class="px-6 py-4 flex justify-between items-center text-xs font-bold text-slate-900 z-10 sticky top-0 bg-slate-50/90 backdrop-blur-md">
+        <div class="px-6 pt-4 pb-2 flex justify-between items-center text-xs font-bold text-slate-900 z-10 bg-slate-50">
             <span>9:41</span>
-            <div class="flex gap-1.5 text-slate-800">
+            <div class="flex gap-1.5">
                 <i class="fa-solid fa-signal"></i>
                 <i class="fa-solid fa-wifi"></i>
                 <i class="fa-solid fa-battery-full"></i>
             </div>
         </div>
 
-        <header class="px-6 pb-2 pt-2 flex justify-between items-center bg-slate-50">
+        <header class="px-6 py-2 pb-4 bg-slate-50 flex justify-between items-center shrink-0">
             <div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Family Vibe</p>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Family Insight</div>
                 <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">The Millers</h1>
             </div>
-            <div class="h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-50">
-                <i class="fa-solid fa-user-group"></i>
+            <div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white shadow-sm">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="Admin">
             </div>
         </header>
 
-        <main class="px-5 pb-24 space-y-5 overflow-y-auto h-full no-scrollbar pt-2">
+        <main class="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8 space-y-6">
 
-            <section id="vibeCard" class="bg-indigo-600 rounded-3xl p-5 text-white shadow-xl relative overflow-hidden transition-colors duration-500">
+            <section id="section1" class="relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br from-indigo-600 to-purple-700">
                 <div class="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl"></div>
-                <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/20 to-transparent"></div>
                 
-                <div class="flex justify-between items-start mb-2 relative z-10">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span id="vibeTagIcon" class="text-xs bg-white/20 px-2 py-0.5 rounded text-white font-bold">
-                                <i class="fa-solid fa-chart-simple"></i> Traffic
-                            </span>
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start mb-1">
+                        <div>
+                            <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider">Section 1: The Digital Vibe</p>
+                            <h2 id="vibeTitle" class="text-xl font-bold">Bandwidth Hogs 🌊</h2>
                         </div>
-                        <h2 id="vibeTitle" class="text-2xl font-bold tracking-tight">Cinema Paradise 🎬</h2>
+                        <span id="vibeBadge" class="bg-white/20 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold border border-white/10">Traffic Analysis</span>
                     </div>
-                </div>
 
-                <div class="flex items-center relative z-10 mt-2">
-                    <div class="w-[160px] h-[160px] relative">
-                        <canvas id="radarChart"></canvas>
-                    </div>
-                    
-                    <div class="flex-1 pl-4 space-y-3" id="vibeStats">
+                    <div class="flex items-center mt-2">
+                        <div class="w-[180px] h-[180px] relative -ml-2">
+                            <canvas id="radarChart"></canvas>
                         </div>
+                        
+                        <div class="flex-1 pl-2 space-y-3">
+                            <div class="group">
+                                <div class="flex justify-between text-xs text-indigo-100 mb-0.5">
+                                    <span id="label1">Download</span>
+                                    <span id="val1" class="font-bold text-white">45 GB</span>
+                                </div>
+                                <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden">
+                                    <div id="bar1" class="h-full bg-pink-400 rounded-full" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div class="group">
+                                <div class="flex justify-between text-xs text-indigo-100 mb-0.5">
+                                    <span id="label2">Video</span>
+                                    <span id="val2" class="font-bold text-white">30 GB</span>
+                                </div>
+                                <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden">
+                                    <div id="bar2" class="h-full bg-amber-400 rounded-full" style="width: 60%"></div>
+                                </div>
+                            </div>
+                            <div class="group">
+                                <div class="flex justify-between text-xs text-indigo-100 mb-0.5">
+                                    <span id="label3">Game</span>
+                                    <span id="val3" class="font-bold text-white">5 GB</span>
+                                </div>
+                                <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden">
+                                    <div id="bar3" class="h-full bg-cyan-400 rounded-full" style="width: 15%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <div id="vibeDesc" class="mt-4 text-xs text-indigo-100 bg-black/10 p-2 rounded-lg leading-relaxed">
-                    High bandwidth detected on streaming services.
+            </section>
+
+            <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-2">
+                    <span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-newspaper"></i></span>
+                    <h3 class="font-bold text-slate-800 text-sm uppercase">Section 2: Miller's Scoop</h3>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex gap-3 items-start">
+                        <span class="text-lg mt-0.5">🌅</span>
+                        <div class="text-xs text-slate-600 leading-relaxed">
+                            <strong class="text-slate-900 block mb-0.5">Morning Glory</strong>
+                            Tom checked Twitter at 6:35 AM before even getting out of bed!
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start">
+                        <span class="text-lg mt-0.5">🚀</span>
+                        <div class="text-xs text-slate-600 leading-relaxed">
+                            <strong class="text-slate-900 block mb-0.5">Bandwidth Hog</strong>
+                            Congrats to Jack! His 4PM Steam update (2.5GB) made the living room Alexa stutter.
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start">
+                        <span class="text-lg mt-0.5">⚖️</span>
+                        <div class="text-xs text-slate-600 leading-relaxed">
+                            <strong class="text-slate-900 block mb-0.5">Work vs Play</strong>
+                            Dad is grinding on Docs at 10 PM, but Emma is still on Roblox...
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
                 <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-amber-100 text-amber-600 w-6 h-6 flex items-center justify-center rounded-lg text-xs shadow-sm">
-                        <i class="fa-solid fa-lightbulb"></i>
-                    </span>
-                    <h3 class="font-bold text-slate-800">Family Scoop</h3>
+                    <span class="bg-green-100 text-green-600 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-bolt"></i></span>
+                    <h3 class="font-bold text-slate-800 text-sm uppercase">Section 3: Live Activity</h3>
                 </div>
-                
-                <div class="space-y-4">
-                    <div class="flex gap-3 items-start">
-                        <div class="mt-0.5 text-lg">🍿</div>
-                        <div>
-                            <p class="text-xs text-slate-600 leading-relaxed"><strong class="text-slate-800">Movie Night?</strong> Video traffic peaked at 8PM. Dad & Mom were sync-watching Netflix.</p>
+                <div class="relative pl-4 border-l-2 border-slate-100 space-y-5">
+                    <div class="relative">
+                        <div class="absolute -left-[21px] top-0 h-3 w-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="flex justify-between items-start">
+                            <p class="text-xs font-bold text-slate-700">Dad's iPhone connected to Wi-Fi</p>
+                            <span class="text-[10px] text-slate-400 font-mono">18:30</span>
                         </div>
                     </div>
-                    <div class="flex gap-3 items-start">
-                        <div class="mt-0.5 text-lg">🐢</div>
-                        <div>
-                            <p class="text-xs text-slate-600 leading-relaxed"><strong class="text-slate-800">Slow Lane:</strong> Gaming downloads slowed down the network by 15% this afternoon.</p>
+                    <div class="relative">
+                        <div class="absolute -left-[21px] top-0 h-3 w-3 rounded-full bg-purple-500 border-2 border-white shadow"></div>
+                        <div class="flex justify-between items-start">
+                            <p class="text-xs font-bold text-slate-700">Jack's PC hit peak (50MB/s)</p>
+                            <span class="text-[10px] text-slate-400 font-mono">16:45</span>
                         </div>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Steam Download Detected</p>
                     </div>
-                </div>
-            </section>
-
-            <section>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-2">Live Activity</h3>
-                <div class="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
-                    <div class="divide-y divide-slate-50">
-                        <div class="p-4 flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-full bg-green-50 text-green-500 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-house-chimney"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <p class="text-sm font-bold text-slate-700">Dad is Home</p>
-                                    <span class="text-[10px] text-slate-400 font-bold">Just now</span>
-                                </div>
-                                <p class="text-xs text-slate-500 mt-0.5">iPhone 15 Pro joined Wi-Fi</p>
-                            </div>
-                        </div>
-                        
-                        <div class="p-4 flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-                                <i class="fa-brands fa-app-store-ios"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <p class="text-sm font-bold text-slate-700">Jack Downloading</p>
-                                    <span class="text-[10px] text-slate-400 font-bold">2 mins ago</span>
-                                </div>
-                                <p class="text-xs text-slate-500 mt-0.5">High traffic on App Store (2.1 GB)</p>
-                            </div>
-                        </div>
-
-                        <div class="p-4 flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-gamepad"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <p class="text-sm font-bold text-slate-700">Emma Gaming</p>
-                                    <span class="text-[10px] text-slate-400 font-bold">45 mins</span>
-                                </div>
-                                <p class="text-xs text-slate-500 mt-0.5">Active on Roblox</p>
-                            </div>
+                    <div class="relative">
+                        <div class="absolute -left-[21px] top-0 h-3 w-3 rounded-full bg-pink-500 border-2 border-white shadow"></div>
+                        <div class="flex justify-between items-start">
+                            <p class="text-xs font-bold text-slate-700">Emma on Roblox for 2 hours</p>
+                            <span class="text-[10px] text-slate-400 font-mono">15:00</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section>
-                <div class="flex justify-between items-center mb-3 px-2">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Achievements</h3>
-                    <span class="text-[10px] bg-slate-200 text-slate-500 px-2 py-0.5 rounded-full font-bold">Last 7 Days</span>
+            <section class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-5 text-white shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-sm uppercase text-slate-400">Section 4: Digital Sync</h3>
+                    <i class="fa-regular fa-heart text-pink-500"></i>
                 </div>
-                
+
+                <div class="bg-white/5 rounded-xl p-3 mb-3 border border-white/10">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex -space-x-2">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" class="w-8 h-8 rounded-full bg-slate-200 border-2 border-slate-800">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" class="w-8 h-8 rounded-full bg-slate-200 border-2 border-slate-800">
+                        </div>
+                        <span class="text-xl font-bold text-slate-400">10%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-1.5 rounded-full mb-2 overflow-hidden">
+                        <div class="bg-slate-500 h-full rounded-full" style="width: 10%"></div>
+                    </div>
+                    <p class="text-[10px] text-slate-300 leading-tight">
+                        You work while he's at school. You rest while he games. <span class="text-slate-500 italic">No overlap.</span>
+                    </p>
+                </div>
+
+                <div class="bg-white/10 rounded-xl p-3 border border-white/20 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-16 h-16 bg-pink-500 blur-2xl opacity-20"></div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex -space-x-2">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" class="w-8 h-8 rounded-full bg-slate-200 border-2 border-slate-800">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Molly" class="w-8 h-8 rounded-full bg-slate-200 border-2 border-slate-800">
+                        </div>
+                        <span class="text-xl font-bold text-pink-400">85%</span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-1.5 rounded-full mb-2 overflow-hidden">
+                        <div class="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full" style="width: 85%"></div>
+                    </div>
+                    <p class="text-[10px] text-slate-200 leading-tight">
+                        High Sync! Your evening streaming schedules align perfectly.
+                    </p>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Section 5: Daily Awards</h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <div onclick="openModal('Jack', 'Night Owl', 5)" class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center gap-3 shadow-sm active:scale-95 transition cursor-pointer relative overflow-hidden group">
-                        <div class="absolute right-2 top-2 text-slate-300 group-hover:text-slate-400"><i class="fa-solid fa-ellipsis"></i></div>
-                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-lg">🦉</div>
-                        <div>
-                            <div class="text-[10px] text-slate-400 font-bold uppercase">Night Owl</div>
-                            <div class="text-sm font-bold text-slate-800">Jack</div>
-                        </div>
+                    <div onclick="showBadgeDetails('Early Bird', 'Mom', 'Online at 5:30 AM for Yoga.', 3)" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                        <div class="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-amber-100">🌅</div>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Early Bird</span>
+                        <span class="text-sm font-bold text-slate-800">Mom</span>
                     </div>
-
-                    <div onclick="openModal('Dad', 'Early Bird', 3)" class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center gap-3 shadow-sm active:scale-95 transition cursor-pointer relative overflow-hidden group">
-                         <div class="absolute right-2 top-2 text-slate-300 group-hover:text-slate-400"><i class="fa-solid fa-ellipsis"></i></div>
-                        <div class="w-10 h-10 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center text-lg">🌅</div>
-                        <div>
-                            <div class="text-[10px] text-slate-400 font-bold uppercase">Early Bird</div>
-                            <div class="text-sm font-bold text-slate-800">Dad</div>
-                        </div>
+                    <div onclick="showBadgeDetails('Night Owl', 'Kevin', 'Last offline: 02:45 AM.', 5)" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                        <div class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-indigo-100">🦉</div>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Night Owl</span>
+                        <span class="text-sm font-bold text-slate-800">Kevin</span>
+                    </div>
+                    <div onclick="showBadgeDetails('Data Monster', 'Jack', 'Consumed 42GB today.', 2)" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                        <div class="w-10 h-10 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-rose-100">🦖</div>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Data Monster</span>
+                        <span class="text-sm font-bold text-slate-800">Jack</span>
+                    </div>
+                    <div onclick="showBadgeDetails('Focus Master', 'Dad', '6h of Office Apps.', 10)" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                        <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-blue-100">🧘</div>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Focus Master</span>
+                        <span class="text-sm font-bold text-slate-800">Dad</span>
                     </div>
                 </div>
             </section>
 
-            <section class="pb-6">
-                <div class="bg-slate-800 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl"><i class="fa-solid fa-utensils"></i></div>
+            <section class="bg-slate-200 rounded-3xl p-5 mb-10">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-700 uppercase text-xs">Section 6: Family Time</h3>
+                    <i class="fa-solid fa-utensils text-slate-400"></i>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                    <p class="text-xs text-slate-500 mb-4">Select devices to pause internet for dinner time:</p>
                     
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-2 mb-2">
-                            <h3 class="font-bold text-lg">Family Time</h3>
-                        </div>
-                        <p class="text-slate-300 text-sm mb-6">Pause internet for dinner or quality bonding.</p>
-                        
-                        <div class="flex -space-x-2 mb-6">
-                            <img class="w-8 h-8 rounded-full border-2 border-slate-800 bg-slate-200" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Dad" alt=""/>
-                            <img class="w-8 h-8 rounded-full border-2 border-slate-800 bg-slate-200" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" alt=""/>
-                            <img class="w-8 h-8 rounded-full border-2 border-slate-800 bg-slate-200" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Emma" alt=""/>
-                            <div class="w-8 h-8 rounded-full border-2 border-slate-800 bg-slate-700 text-xs flex items-center justify-center font-bold">+2</div>
-                        </div>
-
-                        <button class="w-full bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-500/30 transition flex items-center justify-center gap-2">
-                            Start Family Time <i class="fa-solid fa-pause"></i>
-                        </button>
+                    <div class="space-y-3 mb-4">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 accent-slate-800 rounded">
+                            <span class="text-sm font-bold text-slate-700">Jack's PC</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" checked class="w-4 h-4 accent-slate-800 rounded">
+                            <span class="text-sm font-bold text-slate-700">Emma's iPad</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" class="w-4 h-4 accent-slate-800 rounded">
+                            <span class="text-sm font-bold text-slate-700">Dad's Laptop</span>
+                        </label>
                     </div>
+
+                    <button onclick="toggleDetox(this)" class="w-full py-3 bg-slate-800 text-white rounded-lg font-bold text-sm hover:bg-slate-700 transition active:scale-95 flex items-center justify-center gap-2">
+                        <span>Pause Internet</span>
+                        <i class="fa-solid fa-pause"></i>
+                    </button>
                 </div>
             </section>
 
         </main>
-
-        <nav class="absolute bottom-0 w-full h-[85px] bg-white border-t border-slate-100 flex justify-around items-start pt-5 px-6 text-slate-300 z-20">
-            <div class="flex flex-col items-center gap-1 text-slate-800">
-                <i class="fa-solid fa-house text-xl"></i>
-                <span class="text-[10px] font-bold">Home</span>
+        
+        <nav class="h-20 bg-white border-t border-slate-100 flex justify-around items-center pb-2 shrink-0 z-20">
+            <div class="flex flex-col items-center gap-1 text-slate-400">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] font-medium">Home</span>
             </div>
-            <div class="flex flex-col items-center gap-1 hover:text-slate-500 transition">
-                <i class="fa-solid fa-chart-pie text-xl"></i>
-                <span class="text-[10px] font-bold">Insight</span>
+            <div class="flex flex-col items-center gap-1 text-indigo-600">
+                <i class="fa-solid fa-chart-pie text-lg"></i>
+                <span class="text-[10px] font-medium">Insight</span>
             </div>
-            <div class="flex flex-col items-center gap-1 hover:text-slate-500 transition">
-                <i class="fa-solid fa-shield-halved text-xl"></i>
-                <span class="text-[10px] font-bold">Protect</span>
+            <div class="flex flex-col items-center gap-1 text-slate-400">
+                <i class="fa-solid fa-shield-halved text-lg"></i>
+                <span class="text-[10px] font-medium">Safety</span>
             </div>
-            <div class="flex flex-col items-center gap-1 hover:text-slate-500 transition">
-                <i class="fa-solid fa-gear text-xl"></i>
-                <span class="text-[10px] font-bold">Settings</span>
+            <div class="flex flex-col items-center gap-1 text-slate-400">
+                <i class="fa-solid fa-gear text-lg"></i>
+                <span class="text-[10px] font-medium">Settings</span>
             </div>
         </nav>
-
-        <div id="achievementModal" class="absolute inset-0 z-50 flex items-center justify-center px-4 pointer-events-none opacity-0 transition-opacity duration-200">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeModal()"></div>
-            
-            <div id="modalContent" class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl transform scale-95 transition-transform duration-200 relative pointer-events-auto">
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-300 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-                
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-sm border border-indigo-100">
-                        <span id="modalIcon">🦉</span>
-                    </div>
-                    <h2 id="modalTitle" class="text-xl font-bold text-slate-800">Night Owl</h2>
-                    <p id="modalUser" class="text-sm text-slate-500 font-medium">Jack</p>
-                </div>
-
-                <div class="bg-slate-50 rounded-2xl p-4 mb-4 border border-slate-100">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-slate-400 uppercase">Current Streak</span>
-                        <span id="modalStreak" class="text-sm font-bold text-indigo-600">5 Days 🔥</span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2">
-                        <div class="bg-indigo-500 h-2 rounded-full" style="width: 70%"></div>
-                    </div>
-                </div>
-
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition">
-                        <div class="text-xs font-bold text-slate-400 w-8">Mon</div>
-                        <div class="flex-1 text-xs text-slate-600">Offline at 01:30 AM</div>
-                        <i class="fa-solid fa-check text-green-500 text-xs"></i>
-                    </div>
-                    <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition">
-                        <div class="text-xs font-bold text-slate-400 w-8">Tue</div>
-                        <div class="flex-1 text-xs text-slate-600">Offline at 02:15 AM</div>
-                        <i class="fa-solid fa-check text-green-500 text-xs"></i>
-                    </div>
-                     <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition">
-                        <div class="text-xs font-bold text-slate-400 w-8">Wed</div>
-                        <div class="flex-1 text-xs text-slate-600">Offline at 01:00 AM</div>
-                        <i class="fa-solid fa-check text-green-500 text-xs"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <script>
-        // --- DATA CONFIGURATION ---
-        const CONFIG = {
-            traffic: {
-                title: "Cinema Paradise 🎬",
-                bg: "bg-indigo-600",
-                desc: "High bandwidth usage on Video & Downloads.",
-                tagIcon: '<i class="fa-solid fa-cloud-arrow-down"></i> Traffic',
-                chartData: [80, 40, 10, 5, 5, 60], // Video, Game, Social, Work, Edu, Download
-                stats: [
-                    { label: "Video", val: "80%", color: "text-white" },
-                    { label: "Download", val: "60%", color: "text-indigo-200" },
-                    { label: "Gaming", val: "40%", color: "text-indigo-200" }
-                ]
-            },
-            time: {
-                title: "Social Buzz 💬",
-                bg: "bg-pink-600",
-                desc: "Long screen time on Social Media & Chat Apps.",
-                tagIcon: '<i class="fa-regular fa-clock"></i> Duration',
-                chartData: [20, 30, 90, 20, 10, 5], // Video, Game, Social, Work, Edu, Download
-                stats: [
-                    { label: "Social", val: "6h 20m", color: "text-white" },
-                    { label: "Gaming", val: "2h 10m", color: "text-pink-200" },
-                    { label: "Video", val: "1h 30m", color: "text-pink-200" }
-                ]
-            }
+        // --- DATA DEFINITIONS ---
+        
+        // Plan A: Traffic (GB) - "Bandwidth Hog"
+        const dataA = {
+            chartData: [20, 30, 10, 5, 5, 90], // Video, Game, Social, Work, Edu, Download
+            title: "Bandwidth Hogs 🌊",
+            badge: "Traffic View",
+            bgClass: "from-indigo-600 to-purple-700",
+            stats: [
+                { label: "Download", val: "45 GB", width: "90%", color: "bg-pink-400" },
+                { label: "Video", val: "30 GB", width: "60%", color: "bg-amber-400" },
+                { label: "Game", val: "5 GB", width: "15%", color: "bg-cyan-400" }
+            ]
         };
 
-        // --- CHART SETUP ---
-        const ctx = document.getElementById('radarChart').getContext('2d');
-        let myRadarChart = new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: ['Video', 'Game', 'Social', 'Work', 'Edu', 'Down'],
-                datasets: [{
-                    data: CONFIG.traffic.chartData,
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    borderColor: 'rgba(255, 255, 255, 0.9)',
-                    pointBackgroundColor: 'rgba(255, 255, 255, 1)',
-                    pointBorderColor: '#fff',
-                    borderWidth: 2,
-                    pointRadius: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    r: {
-                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        pointLabels: { color: 'rgba(255, 255, 255, 0.8)', font: { size: 9, weight: 'bold' } },
-                        ticks: { display: false, maxTicksLimit: 1 },
-                        suggestedMin: 0,
-                        suggestedMax: 100
-                    }
-                },
-                plugins: { legend: { display: false } }
-            }
-        });
+        // Plan B: Time (Hrs) - "Time Consumer"
+        const dataB = {
+            chartData: [30, 80, 50, 90, 20, 5], // Video, Game, Social, Work, Edu, Download
+            title: "Time Consumers ⏳",
+            badge: "Time View",
+            bgClass: "from-emerald-600 to-teal-700",
+            stats: [
+                { label: "Work", val: "8.5 Hrs", width: "90%", color: "bg-emerald-300" },
+                { label: "Game", val: "6.2 Hrs", width: "70%", color: "bg-lime-300" },
+                { label: "Social", val: "4.0 Hrs", width: "45%", color: "bg-teal-200" }
+            ]
+        };
 
-        // --- RENDER FUNCTION ---
-        function renderStats(stats) {
-            const container = document.getElementById('vibeStats');
-            container.innerHTML = stats.map(s => `
-                <div class="flex justify-between items-center text-xs border-b border-white/20 pb-1.5 last:border-0">
-                    <span class="${s.color} opacity-80">${s.label}</span>
-                    <span class="font-bold text-white">${s.val}</span>
-                </div>
-            `).join('');
+        let currentMode = 'A';
+        let myRadarChart = null;
+
+        // --- INIT CHART ---
+        function initChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            myRadarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Video', 'Game', 'Social', 'Work', 'Edu', 'Download'],
+                    datasets: [{
+                        label: 'Usage',
+                        data: dataA.chartData,
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        borderColor: 'rgba(255, 255, 255, 0.9)',
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#fff',
+                        borderWidth: 2,
+                        pointRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: 'rgba(255, 255, 255, 0.7)', font: { size: 9 } },
+                            ticks: { display: false, maxTicksLimit: 3 },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    animation: { duration: 1000 }
+                }
+            });
         }
 
-        // --- SWITCH MODE FUNCTION ---
+        // --- SWITCH LOGIC ---
         function switchMode(mode) {
-            const data = CONFIG[mode];
-            const card = document.getElementById('vibeCard');
-            const btnTraffic = document.getElementById('btnTraffic');
-            const btnTime = document.getElementById('btnTime');
+            currentMode = mode;
+            const data = mode === 'A' ? dataA : dataB;
+            const section1 = document.getElementById('section1');
+            const btnA = document.getElementById('btnA');
+            const btnB = document.getElementById('btnB');
 
             // 1. Update Buttons State
-            if (mode === 'traffic') {
-                btnTraffic.className = "px-4 py-1.5 rounded-md text-sm font-bold bg-indigo-500 text-white transition-all shadow-lg";
-                btnTime.className = "px-4 py-1.5 rounded-md text-sm font-bold text-slate-400 hover:text-white transition-all";
-                card.className = "bg-indigo-600 rounded-3xl p-5 text-white shadow-xl relative overflow-hidden transition-colors duration-500";
+            if(mode === 'A') {
+                btnA.className = "w-full py-2 px-4 rounded-lg text-sm font-bold transition-all bg-indigo-600 text-white shadow-md";
+                btnB.className = "w-full py-2 px-4 rounded-lg text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
             } else {
-                btnTraffic.className = "px-4 py-1.5 rounded-md text-sm font-bold text-slate-400 hover:text-white transition-all";
-                btnTime.className = "px-4 py-1.5 rounded-md text-sm font-bold bg-pink-500 text-white transition-all shadow-lg";
-                card.className = "bg-pink-600 rounded-3xl p-5 text-white shadow-xl relative overflow-hidden transition-colors duration-500";
+                btnB.className = "w-full py-2 px-4 rounded-lg text-sm font-bold transition-all bg-teal-600 text-white shadow-md";
+                btnA.className = "w-full py-2 px-4 rounded-lg text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
             }
 
-            // 2. Update Text Content
-            document.getElementById('vibeTitle').innerText = data.title;
-            document.getElementById('vibeDesc').innerText = data.desc;
-            document.getElementById('vibeTagIcon').innerHTML = data.tagIcon;
+            // 2. Update Background Gradient
+            section1.className = `relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br ${data.bgClass}`;
 
-            // 3. Update Chart
+            // 3. Update Text Content
+            document.getElementById('vibeTitle').innerText = data.title;
+            document.getElementById('vibeBadge').innerText = data.badge;
+
+            // 4. Update Stats Bars
+            data.stats.forEach((stat, index) => {
+                const i = index + 1;
+                document.getElementById(`label${i}`).innerText = stat.label;
+                document.getElementById(`val${i}`).innerText = stat.val;
+                
+                const bar = document.getElementById(`bar${i}`);
+                bar.style.width = stat.width;
+                // Remove old color classes and add new one
+                bar.className = `h-full rounded-full transition-all duration-700 ${stat.color}`;
+            });
+
+            // 5. Update Chart
             myRadarChart.data.datasets[0].data = data.chartData;
             myRadarChart.update();
-
-            // 4. Update Stats List
-            renderStats(data.stats);
         }
 
-        // --- MODAL FUNCTIONS ---
-        function openModal(user, title, streak) {
-            const modal = document.getElementById('achievementModal');
-            const content = document.getElementById('modalContent');
+        // --- BADGE POPUP ---
+        function showBadgeDetails(title, user, desc, streak) {
+            const streakMsg = streak > 1 ? `\n🔥 ${user} has held this title for ${streak} days!` : '';
+            alert(`🏆 Achievement Unlocked: ${title}\n\nWinner: ${user}\nReason: ${desc}${streakMsg}`);
+        }
+
+        // --- FAMILY TIME TOGGLE ---
+        function toggleDetox(btn) {
+            const icon = btn.querySelector('i');
+            const span = btn.querySelector('span');
             
-            // Set Content
-            document.getElementById('modalUser').innerText = user;
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalStreak').innerText = streak + " Days 🔥";
-            document.getElementById('modalIcon').innerText = title === 'Night Owl' ? '🦉' : '🌅';
-
-            // Show
-            modal.classList.remove('pointer-events-none', 'opacity-0');
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100');
+            if (span.innerText === "Pause Internet") {
+                btn.classList.replace('bg-slate-800', 'bg-red-500');
+                btn.classList.replace('hover:bg-slate-700', 'hover:bg-red-400');
+                span.innerText = "Resume Internet";
+                icon.className = "fa-solid fa-play";
+                alert("⏸️ Internet paused for selected devices. Enjoy family time!");
+            } else {
+                btn.classList.replace('bg-red-500', 'bg-slate-800');
+                btn.classList.replace('hover:bg-red-400', 'hover:bg-slate-700');
+                span.innerText = "Pause Internet";
+                icon.className = "fa-solid fa-pause";
+                alert("▶️ Internet resumed.");
+            }
         }
 
-        function closeModal() {
-            const modal = document.getElementById('achievementModal');
-            const content = document.getElementById('modalContent');
-            
-            // Hide
-            modal.classList.add('pointer-events-none', 'opacity-0');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-        }
-
-        // Initialize Default View
-        renderStats(CONFIG.traffic.stats);
+        // Initialize
+        window.onload = initChart;
 
     </script>
 </body>
