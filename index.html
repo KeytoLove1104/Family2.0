@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Insight - Stories Enhanced</title>
+    <title>Family Insight - Dashboard</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,11 +16,6 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Animation utils */
-        .slide-enter-active, .slide-leave-active { transition: transform 0.3s ease-in-out; }
-        .slide-enter-from, .slide-leave-to { transform: translateX(100%); }
-        .slide-enter-to, .slide-leave-from { transform: translateX(0); }
-
         /* Custom buttons */
         .btn-purple {
             background: linear-gradient(135deg, #7c3aed, #6d28d9);
@@ -32,6 +27,11 @@
             color: white;
             box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3);
         }
+        .btn-orange {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.3);
+        }
         .btn-inactive {
             background: white;
             color: #4b5563;
@@ -42,55 +42,100 @@
         .editable:hover .edit-icon { opacity: 1; }
         .edit-icon { opacity: 0; transition: opacity 0.2s; margin-left: 4px; cursor: pointer; }
 
-        /* Card styles for stories */
-        .story-card {
-            transition: all 0.3s ease;
-        }
-        .story-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Prompt Sidebar Animation */
+        /* Animation for Prompt Sidebar */
         #promptSidebar {
             transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Modal Animation */
+        #badgeModal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #badgeModal.hidden-modal {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+        #badgeModal.visible-modal {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+        
+        /* Fade transition for story content */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen py-10 relative overflow-x-hidden">
 
-    <!-- Mode Switcher -->
-    <div class="fixed top-6 left-6 z-50 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64 hidden xl:block">
-        <h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Leader View Control</h3>
-        <div class="space-y-2">
-            <button onclick="switchMode('A')" id="btnA" class="w-full py-2 px-4 rounded-lg text-sm font-bold transition-all btn-purple">
-                Plan A: Traffic View (流量)
+    <!-- LEADER VIEW CONTROL SIDEBAR -->
+    <div class="fixed top-6 left-6 z-50 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64 hidden xl:block h-[850px] overflow-y-auto hide-scrollbar">
+        <!-- Section 1 Controls -->
+        <h3 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Metric Control</h3>
+        <div class="space-y-2 mb-6">
+            <button onclick="switchMode('A')" id="btnA" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-purple text-left flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie w-4"></i> Plan A: Traffic (流量)
             </button>
-            <button onclick="switchMode('B')" id="btnB" class="w-full py-2 px-4 rounded-lg text-sm font-bold transition-all btn-inactive">
-                Plan B: Time View (时长)
+            <button onclick="switchMode('B')" id="btnB" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
+                <i class="fa-solid fa-clock w-4"></i> Plan B: Time (时长)
             </button>
-            <button onclick="switchMode('C')" id="btnC" class="w-full py-2 px-4 rounded-lg text-sm font-bold transition-all btn-inactive">
-                Plan C: Activity View (活跃度)
+            <button onclick="switchMode('C')" id="btnC" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
+                <i class="fa-solid fa-bolt w-4"></i> Plan C: Active (活跃)
             </button>
+        </div>
+
+        <!-- Section 2 Controls (New) -->
+        <div class="border-t border-slate-100 pt-4 mb-2">
+            <h3 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Story Narrator</h3>
+            <div class="space-y-2">
+                <button onclick="switchStory(1)" id="storyBtn1" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-orange text-left flex items-center gap-2">
+                    <i class="fa-solid fa-file-lines w-4"></i> Standard (标准)
+                </button>
+                <button onclick="switchStory(2)" id="storyBtn2" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad w-4"></i> Gamified (游戏)
+                </button>
+                <button onclick="switchStory(3)" id="storyBtn3" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
+                    <i class="fa-solid fa-newspaper w-4"></i> Gossip (八卦)
+                </button>
+                <button onclick="switchStory(4)" id="storyBtn4" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass-chart w-4"></i> Behavior (行为)
+                </button>
+                <button onclick="switchStory(5)" id="storyBtn5" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-moon w-4"></i> Atmosphere (氛围)
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-6 p-3 bg-slate-50 rounded-lg border border-slate-100 text-[10px] text-slate-400 leading-relaxed">
+            <i class="fa-solid fa-info-circle mr-1"></i> Use these controls to toggle the display modes on the main device view.
         </div>
     </div>
 
-    <!-- Prompt Sidebar (Right Side) -->
+    <!-- PROMPT SIDEBAR (Right Side) -->
     <div id="promptSidebar" class="fixed top-1/2 -translate-y-1/2 right-6 xl:right-20 z-40 w-80 bg-white p-6 rounded-2xl shadow-2xl border border-slate-200 opacity-0 translate-x-10 pointer-events-none transition-all duration-500">
         <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Prompt Details</h3>
             <button onclick="closePrompt()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div id="promptContent" class="text-sm text-slate-600 leading-relaxed font-mono bg-slate-50 p-3 rounded-lg border border-slate-100">
-            Select a story card to view the underlying prompt.
+        <div class="space-y-3">
+            <div class="text-[10px] font-bold text-slate-400 uppercase">Input Prompt (Chinese)</div>
+            <div id="promptContent" class="text-sm text-slate-600 leading-relaxed font-mono bg-slate-50 p-3 rounded-lg border border-slate-100">
+                Select a story to view the underlying prompt.
+            </div>
         </div>
         <div class="mt-4 pt-2 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-400">
             <i class="fa-solid fa-robot"></i>
-            <span>Generated by AI Model</span>
+            <span>Generated by Family AI Model</span>
         </div>
     </div>
 
-    <!-- Main Mobile Device -->
+    <!-- MAIN DEVICE -->
     <div class="w-full max-w-[400px] bg-slate-50 h-[850px] rounded-[40px] shadow-2xl overflow-hidden border-[8px] border-slate-900 relative flex flex-col">
         
         <!-- Status Bar -->
@@ -121,15 +166,15 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8 space-y-6">
+            <main class="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8 space-y-6 relative">
 
-                <!-- Section 1 -->
+                <!-- Section 1: Chart (Controlled by Plan A/B/C) -->
                 <section id="section1" class="relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br from-indigo-600 to-purple-700">
                     <div class="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl"></div>
                     <div class="relative z-10">
                         <div class="flex justify-between items-start mb-1">
                             <div>
-                                <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider">Section 1: The Digital Vibe</p>
+                                <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider">The Digital Vibe</p>
                                 <h2 id="vibeTitle" class="text-xl font-bold">Cinema Paradise 🎬</h2>
                             </div>
                             <span id="vibeBadge" class="bg-white/20 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold border border-white/10">Traffic Analysis</span>
@@ -156,37 +201,30 @@
                     </div>
                 </section>
 
-                <!-- Section 2: Clickable -->
-                <section onclick="openStories()" class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 cursor-pointer hover:border-indigo-100 hover:shadow-md transition-all group relative overflow-hidden">
-                    <div class="absolute right-0 top-0 w-20 h-20 bg-indigo-50 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                <!-- Section 2: Family Scoop (Controlled by Story Narrator) -->
+                <section id="storySection" class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 transition-all duration-300">
                     
-                    <div class="flex justify-between items-start relative z-10">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-newspaper"></i></span>
-                            <h3 class="font-bold text-slate-800 text-sm uppercase">Section 2: Miller's Scoop</h3>
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
+                            <span id="storyIcon" class="bg-orange-100 text-orange-600 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-newspaper"></i></span>
+                            <h3 id="storyTitle" class="font-bold text-slate-800 text-sm uppercase">Family Scoop</h3>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-indigo-500 transition-colors"></i>
+                        <!-- Prompt Trigger -->
+                        <button onclick="showCurrentPrompt()" class="text-[10px] font-bold text-orange-500 hover:text-orange-700 bg-orange-50 px-2 py-1 rounded-md transition-colors border border-orange-100">
+                            <i class="fa-solid fa-terminal mr-1"></i>Prompt
+                        </button>
                     </div>
                     
-                    <div class="space-y-3 relative z-10">
-                        <div class="flex gap-3 items-center">
-                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-lg flex-shrink-0">🌅</div>
-                            <div class="text-xs text-slate-600">
-                                <span class="font-bold text-slate-800">Latest Story Generated</span>
-                                <p class="line-clamp-1">Dad started the day with emails...</p>
-                            </div>
-                        </div>
-                        <div class="w-full bg-slate-50 p-2 rounded-lg text-center text-xs font-bold text-indigo-600 mt-2 group-hover:bg-indigo-50 transition-colors">
-                            View all 5 Story Variations
-                        </div>
+                    <div id="storyContent" class="mt-2 text-sm text-slate-600 leading-relaxed font-medium">
+                        <!-- Content injected via JS -->
                     </div>
                 </section>
 
-                <!-- Section 3 -->
+                <!-- Section 3: Live Activity -->
                 <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="bg-green-100 text-green-600 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-bolt"></i></span>
-                        <h3 class="font-bold text-slate-800 text-sm uppercase">Section 3: Live Activity</h3>
+                        <h3 class="font-bold text-slate-800 text-sm uppercase">Live Activity</h3>
                     </div>
                     <div class="relative pl-4 border-l-2 border-slate-100 space-y-5">
                         <div class="relative">
@@ -204,48 +242,62 @@
                     </div>
                 </section>
 
-                <!-- Section 4 -->
+                <!-- Section 4: Digital Sync -->
                 <section class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-5 text-white shadow-lg">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-sm uppercase text-slate-400">Section 4: Digital Sync</h3>
-                        <i class="fa-regular fa-heart text-pink-500"></i>
+                        <h3 class="font-bold text-sm uppercase text-slate-400">Digital Sync</h3>
+                        <button class="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors text-slate-300">
+                            <i class="fa-solid fa-user-group mr-1"></i> Switch
+                        </button>
                     </div>
-                    <div class="bg-white/10 rounded-xl p-3 border border-white/20 relative overflow-hidden">
+                    <div class="bg-white/10 rounded-xl p-4 border border-white/20 relative overflow-hidden">
                         <div class="absolute right-0 top-0 w-16 h-16 bg-pink-500 blur-2xl opacity-20"></div>
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex -space-x-2">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" class="w-8 h-8 rounded-full bg-slate-200 border-2 border-slate-800">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Molly" class="w-8 h-8 rounded-full bg-slate-200 border-2 border-slate-800">
+                        
+                        <div class="flex items-center justify-between mb-3 px-2">
+                            <div class="flex flex-col items-center">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" class="w-10 h-10 rounded-full bg-slate-200 border-2 border-slate-800 shadow-lg">
+                                <span class="text-[10px] mt-1 text-slate-400 font-bold">Dad</span>
                             </div>
-                            <span class="text-xl font-bold text-pink-400">85%</span>
+                            
+                            <div class="flex flex-col items-center flex-1 px-4">
+                                <span class="text-2xl font-bold text-pink-400 mb-1">85%</span>
+                                <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-center">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Molly" class="w-10 h-10 rounded-full bg-slate-200 border-2 border-slate-800 shadow-lg">
+                                <span class="text-[10px] mt-1 text-slate-400 font-bold">Mom</span>
+                            </div>
                         </div>
-                        <div class="w-full bg-slate-700 h-1.5 rounded-full mb-2 overflow-hidden">
-                            <div class="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full" style="width: 85%"></div>
-                        </div>
-                        <p class="text-[10px] text-slate-200 leading-tight">High Sync! Your evening streaming schedules align perfectly.</p>
+                        
+                        <p class="text-[10px] text-slate-200 leading-relaxed text-center opacity-90">
+                            Your compatibility is very high! You both enjoy visiting YouTube and surfing the web at night.
+                        </p>
                     </div>
                 </section>
 
-                <!-- Section 5 -->
+                <!-- Section 5: Daily Awards -->
                 <section>
-                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Section 5: Daily Awards</h3>
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Daily Awards</h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <div onclick="showBadgeDetails('Early Bird', 'Mom', 'Online at 5:30 AM for Yoga.', 3, 2)" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                        <div onclick="showBadgeDetails('Early Bird', 'Mom', 'Online at 5:30 AM for Yoga.', '3', '2')" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
                             <div class="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-amber-100">🌅</div>
                             <span class="text-[10px] text-slate-400 font-bold uppercase">Early Bird</span>
                             <span class="text-sm font-bold text-slate-800">Mom</span>
                         </div>
-                        <div onclick="showBadgeDetails('Night Owl', 'Kevin', 'Last offline: 02:45 AM.', 5, 4)" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                        <div onclick="showBadgeDetails('Night Owl', 'Kevin', 'Last offline: 02:45 AM.', '5', '4')" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
                             <div class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-indigo-100">🦉</div>
                             <span class="text-[10px] text-slate-400 font-bold uppercase">Night Owl</span>
                             <span class="text-sm font-bold text-slate-800">Kevin</span>
                         </div>
-                        <div onclick="showBadgeDetails('Data Monster', 'Jack', 'Consumed 42GB today.', 2, 1)" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                        <div onclick="showBadgeDetails('Data Monster', 'Jack', 'Consumed 42GB today.', '2', '1')" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
                             <div class="w-10 h-10 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-rose-100">🦖</div>
                             <span class="text-[10px] text-slate-400 font-bold uppercase">Data Monster</span>
                             <span class="text-sm font-bold text-slate-800">Jack</span>
                         </div>
-                        <div onclick="showBadgeDetails('Focus Master', 'Dad', '6h of Office Apps.', 10, 7)" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                        <div onclick="showBadgeDetails('Focus Master', 'Dad', '6h of Office Apps.', '10', '7')" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
                             <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-blue-100">🧘</div>
                             <span class="text-[10px] text-slate-400 font-bold uppercase">Focus Master</span>
                             <span class="text-sm font-bold text-slate-800">Dad</span>
@@ -253,243 +305,162 @@
                     </div>
                 </section>
 
-                <!-- Section 6 -->
-                <section class="bg-slate-200 rounded-3xl p-5 mb-10">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-slate-700 uppercase text-xs">Section 6: Family Time</h3>
-                        <i class="fa-solid fa-utensils text-slate-400"></i>
-                    </div>
-                    <div class="bg-white rounded-xl p-4 shadow-sm">
-                        <p class="text-xs text-slate-500 mb-4">Select devices to pause internet for dinner time:</p>
-                        <div class="space-y-3 mb-4">
-                            <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 accent-slate-800 rounded"><span class="text-sm font-bold text-slate-700">Jack's PC</span></label>
-                            <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 accent-slate-800 rounded"><span class="text-sm font-bold text-slate-700">Emma's iPad</span></label>
-                            <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="w-4 h-4 accent-slate-800 rounded"><span class="text-sm font-bold text-slate-700">Dad's Laptop</span></label>
+                <!-- Section 6: Network Statistics (Fixed Chart) -->
+                <section class="bg-slate-800 rounded-3xl p-5 text-white shadow-lg mb-10">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-emerald-500/20 text-emerald-400 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-chart-simple"></i></span>
+                            <h3 class="font-bold text-sm uppercase text-slate-200">Network Stats</h3>
                         </div>
-                        <button onclick="toggleDetox(this)" class="w-full py-3 bg-slate-800 text-white rounded-lg font-bold text-sm hover:bg-slate-700 transition active:scale-95 flex items-center justify-center gap-2"><span>Pause Internet</span><i class="fa-solid fa-pause"></i></button>
+                        <span class="text-[10px] text-slate-500 bg-slate-900/50 px-2 py-1 rounded">Updated Just now</span>
+                    </div>
+                    
+                    <!-- Today -->
+                    <div class="mb-5">
+                        <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wider">Today (24h)</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                             <div class="bg-white/5 p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+                                 <div class="text-[10px] text-slate-400 uppercase">Total Traffic</div>
+                                 <div class="text-xl font-bold text-emerald-400 my-0.5">145 GB</div>
+                                 <div class="text-[9px] text-slate-500">Video 90GB · Game 40GB</div>
+                             </div>
+                             <div class="bg-white/5 p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+                                 <div class="text-[10px] text-slate-400 uppercase">Total Time</div>
+                                 <div class="text-xl font-bold text-blue-400 my-0.5">32.5 Hrs</div>
+                                 <div class="text-[9px] text-slate-500">Across 8 devices</div>
+                             </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-3">
+                             <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex justify-between items-center hover:bg-white/10 transition-colors">
+                                 <div>
+                                    <div class="text-[10px] text-slate-400 uppercase">Online Devices</div>
+                                    <div class="text-lg font-bold">8</div>
+                                 </div>
+                                 <i class="fa-solid fa-laptop text-slate-600 text-lg"></i>
+                             </div>
+                             <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex justify-between items-center hover:bg-white/10 transition-colors">
+                                 <div>
+                                    <div class="text-[10px] text-slate-400 uppercase">Apps Visited</div>
+                                    <div class="text-lg font-bold">42</div>
+                                 </div>
+                                 <i class="fa-solid fa-layer-group text-slate-600 text-lg"></i>
+                             </div>
+                        </div>
+                    </div>
+
+                    <!-- History -->
+                    <div class="pt-3 border-t border-white/10">
+                        <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-wider">History (All Time)</h4>
+                        <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 flex justify-between divide-x divide-white/10">
+                            <div class="px-2 text-center flex-1">
+                                <div class="text-[9px] text-slate-500 uppercase mb-1">Traffic</div>
+                                <div class="font-bold text-sm text-slate-200">4.2 TB</div>
+                            </div>
+                            <div class="px-2 text-center flex-1">
+                                <div class="text-[9px] text-slate-500 uppercase mb-1">Time</div>
+                                <div class="font-bold text-sm text-slate-200">1.2k Hr</div>
+                            </div>
+                             <div class="px-2 text-center flex-1">
+                                <div class="text-[9px] text-slate-500 uppercase mb-1">Apps</div>
+                                <div class="font-bold text-sm text-slate-200">156</div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
             </main>
             
             <nav class="h-20 bg-white border-t border-slate-100 flex justify-around items-center pb-2 shrink-0 z-20">
-                <div class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-house text-lg"></i><span class="text-[10px] font-medium">Home</span></div>
-                <div class="flex flex-col items-center gap-1 text-indigo-600"><i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[10px] font-medium">Insight</span></div>
+                <div class="flex flex-col items-center gap-1 text-indigo-600"><i class="fa-solid fa-house text-lg"></i><span class="text-[10px] font-medium">Home</span></div>
+                <div class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[10px] font-medium">Insight</span></div>
                 <div class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-shield-halved text-lg"></i><span class="text-[10px] font-medium">Safety</span></div>
                 <div class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-gear text-lg"></i><span class="text-[10px] font-medium">Settings</span></div>
             </nav>
         </div>
 
-        <!-- STORY VIEW CONTAINER (Hidden by default) -->
-        <div id="storyView" class="flex flex-col h-full w-full absolute top-0 left-0 pt-[44px] translate-x-full transition-transform duration-300 ease-in-out bg-slate-100 z-40">
-            <header class="px-5 py-3 flex items-center gap-4 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10">
-                <button onclick="closeStories()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors">
-                    <i class="fa-solid fa-arrow-left text-sm"></i>
-                </button>
-                <h2 class="text-lg font-bold text-slate-800">Today's Stories</h2>
-            </header>
-
-            <main class="flex-1 overflow-y-auto hide-scrollbar px-5 py-6 space-y-4">
-                
-                <!-- Card 1: Default Safe -->
-                <div class="story-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group overflow-hidden">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-full -mr-6 -mt-6"></div>
-                    <div class="relative z-10">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm"><i class="fa-solid fa-shield-cat"></i></div>
-                                <h3 class="font-bold text-slate-800 text-sm">Default Safe</h3>
-                            </div>
-                            <button onclick="showPrompt(1)" class="text-xs font-bold text-blue-500 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded-md transition-colors">Prompt</button>
+        <!-- APP MODAL -->
+        <div id="badgeModal" class="absolute inset-0 z-[60] flex items-center justify-center p-6 hidden-modal">
+            <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeBadgeModal()"></div>
+            <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 relative z-10 animate-scale-in">
+                <div class="flex justify-end">
+                    <button onclick="closeBadgeModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center bg-slate-50"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="flex flex-col items-center text-center -mt-2">
+                    <div id="modalIcon" class="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-4 text-4xl shadow-sm border-4 border-amber-100">
+                        🏆
+                    </div>
+                    <h3 id="modalTitle" class="text-xl font-extrabold text-slate-800 mb-1">Achievement</h3>
+                    <p id="modalUser" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">Winner Name</p>
+                    
+                    <div class="w-full bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4">
+                        <p id="modalDesc" class="text-sm text-slate-600 font-medium leading-relaxed">Description goes here.</p>
+                    </div>
+                    
+                    <div class="flex w-full gap-3">
+                        <div class="flex-1 bg-slate-50 rounded-xl p-3 border border-slate-100">
+                            <span class="block text-xs text-slate-400 font-bold uppercase">Total</span>
+                            <span id="modalTotal" class="block text-xl font-bold text-slate-800">0</span>
                         </div>
-                        <div class="text-sm text-slate-600 leading-relaxed font-medium">
-                            Dad started the day with emails and light videos ☕<br>
-                            Mom checked social feeds between daily tasks.<br>
-                            Kids switched between homework and short video breaks.<br>
-                            In the evening, the house settled into streaming and scrolling 📺<br>
-                            A balanced day of work, learning, and relaxation.
+                        <div class="flex-1 bg-slate-50 rounded-xl p-3 border border-slate-100">
+                            <span class="block text-xs text-slate-400 font-bold uppercase">Streak</span>
+                            <span id="modalStreak" class="block text-xl font-bold text-indigo-600">0</span>
                         </div>
                     </div>
+                    
+                    <button onclick="closeBadgeModal()" class="mt-6 w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-200 active:scale-95 transition">Awesome!</button>
                 </div>
-
-                <!-- Card 2: Gamified -->
-                <div class="story-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group overflow-hidden">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-purple-50 rounded-bl-full -mr-6 -mt-6"></div>
-                    <div class="relative z-10">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm"><i class="fa-solid fa-gamepad"></i></div>
-                                <h3 class="font-bold text-slate-800 text-sm">Gamified Story</h3>
-                            </div>
-                            <button onclick="showPrompt(2)" class="text-xs font-bold text-purple-500 hover:text-purple-700 bg-purple-50 px-2 py-1 rounded-md transition-colors">Prompt</button>
-                        </div>
-                        <div class="text-sm text-slate-600 leading-relaxed font-medium">
-                            Morning quests began with work emails and school videos 🎮<br>
-                            By noon, tasks were cleared and skills leveled up.<br>
-                            Afternoon playtime unlocked games and chats.<br>
-                            Night mode activated with streaming and late scrolling 🌙<br>
-                            All players logged off successfully.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 3: Gossip -->
-                <div class="story-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group overflow-hidden">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-rose-50 rounded-bl-full -mr-6 -mt-6"></div>
-                    <div class="relative z-10">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-sm"><i class="fa-solid fa-newspaper"></i></div>
-                                <h3 class="font-bold text-slate-800 text-sm">Family Gossip</h3>
-                            </div>
-                            <button onclick="showPrompt(3)" class="text-xs font-bold text-rose-500 hover:text-rose-700 bg-rose-50 px-2 py-1 rounded-md transition-colors">Prompt</button>
-                        </div>
-                        <div class="text-sm text-slate-600 leading-relaxed font-medium">
-                            Dad stayed loyal to work apps, with a few video breaks 👀<br>
-                            Mom kept up with social updates all day.<br>
-                            The kids bounced between schoolwork and games.<br>
-                            After dinner, everyone went quiet—screens on, lights low 📱<br>
-                            Classic family internet drama.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4: Behavior -->
-                <div class="story-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group overflow-hidden">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-teal-50 rounded-bl-full -mr-6 -mt-6"></div>
-                    <div class="relative z-10">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center text-sm"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
-                                <h3 class="font-bold text-slate-800 text-sm">Behavior Insight</h3>
-                            </div>
-                            <button onclick="showPrompt(4)" class="text-xs font-bold text-teal-500 hover:text-teal-700 bg-teal-50 px-2 py-1 rounded-md transition-colors">Prompt</button>
-                        </div>
-                        <div class="text-sm text-slate-600 leading-relaxed font-medium">
-                            Morning activity leaned toward productivity and study.<br>
-                            Midday usage was lighter and more fragmented.<br>
-                            Afternoons mixed learning with entertainment.<br>
-                            Evenings showed synchronized screen time across the family 📊<br>
-                            Clear routines, minimal conflict.
-                        </div>
-                    </div>
-                </div>
-
-                 <!-- Card 5: Atmospheric -->
-                 <div class="story-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative group overflow-hidden">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-amber-50 rounded-bl-full -mr-6 -mt-6"></div>
-                    <div class="relative z-10">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm"><i class="fa-solid fa-cloud-moon"></i></div>
-                                <h3 class="font-bold text-slate-800 text-sm">Atmospheric</h3>
-                            </div>
-                            <button onclick="showPrompt(5)" class="text-xs font-bold text-amber-500 hover:text-amber-700 bg-amber-50 px-2 py-1 rounded-md transition-colors">Prompt</button>
-                        </div>
-                        <div class="text-sm text-slate-600 leading-relaxed font-medium">
-                            The day began quietly, screens waking with the house 🌅<br>
-                            Signals flowed in and out through shared routines.<br>
-                            Laughter, focus, and pauses filled the afternoon.<br>
-                            By night, soft light and steady streams took over ✨<br>
-                            The home rested online.
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="h-10"></div>
-            </main>
+            </div>
         </div>
 
     </div>
 
     <script>
-        // --- STORY NAVIGATION ---
-        function openStories() {
-            const homeView = document.getElementById('homeView');
-            const storyView = document.getElementById('storyView');
-            
-            // Slide effect
-            storyView.classList.remove('translate-x-full');
-            // Slight scale down of home view for depth effect (optional, kept simple for now)
-            // homeView.classList.add('-translate-x-1/4', 'opacity-50'); 
-        }
-
-        function closeStories() {
-            const homeView = document.getElementById('homeView');
-            const storyView = document.getElementById('storyView');
-            
-            storyView.classList.add('translate-x-full');
-            // homeView.classList.remove('-translate-x-1/4', 'opacity-50');
-            
-            // Also close prompt sidebar
-            closePrompt();
-        }
-
-        // --- PROMPT SIDEBAR LOGIC ---
+        // --- DATA & CONFIG ---
+        
+        // Prompts (Chinese)
         const prompts = {
-            1: `Based on a full day of family network logs, generate a neutral, friendly “Today’s Network Story”.
-Summarize work, study, and entertainment across the whole day.
-Limit to under 60 words.
-Use short sentences (one sentence per line).
-Use no more than 5 emojis.
-Avoid numbers and heavy statistics.
-Tone: calm, balanced, family-friendly.`,
-            2: `Turn today’s family network activity into a light gamified story.
-Describe the day as levels, missions, or rounds.
-Cover morning to night.
-Under 60 words.
-One sentence per line.
-No more than 5 emojis.
-Avoid exact data values.
-Tone: playful, energetic.`,
-            3: `Write today’s family network story like a light gossip column.
-Focus on “who did what online” throughout the day.
-Keep it playful, not judgmental.
-Under 60 words.
-One sentence per line.
-Max 5 emojis.
-Avoid numbers and technical terms.`,
-            4: `Summarize today’s family network usage from a behavioral insight perspective.
-Focus on patterns and rhythms, not details.
-Morning to night coverage.
-Under 60 words.
-One sentence per line.
-Max 5 emojis.
-Tone: observational, thoughtful.`,
-            5: `Create an abstract, atmospheric story based on a full day of family network activity.
-Focus on mood and flow, not specific actions.
-Under 60 words.
-One sentence per line.
-Use up to 5 emojis.
-Language should feel calm and visual.`
+            1: "基于全天的家庭网络日志，生成一个中立、友好的“今日网络故事”。\n总结全天的工作、学习和娱乐情况。\n限制在60字以内。\n每行一句话。\n最多使用5个表情符号。\n避免数字和繁重的统计数据。\n语气：平静、平衡、适合家庭。",
+            2: "将今天的家庭网络活动变成一个轻松的游戏化故事。\n把一天描述为关卡、任务或回合。\n涵盖从早到晚。\n60字以内。\n每行一句话。\n最多5个表情符号。\n语气：顽皮、充满活力。",
+            3: "像写轻松的八卦专栏一样写今天的家庭网络故事。\n关注“谁在线上做了什么”。\n保持顽皮，不要评判。\n60字以内。\n每行一句话。\n避免数字。",
+            4: "从行为洞察的角度总结今天的家庭网络使用情况。\n关注模式和节奏，而不是细节。\n涵盖从早到晚。\n60字以内。\n每行一句话。\n语气：观察性、深思熟虑。",
+            5: "基于全天的家庭网络活动创建一个抽象、充满氛围的故事。\n关注情绪和流动，而不是具体行动。\n60字以内。\n每行一句话。\n语言感觉平静且具象。"
         };
 
-        function showPrompt(id) {
-            const sidebar = document.getElementById('promptSidebar');
-            const content = document.getElementById('promptContent');
-            
-            content.innerText = prompts[id];
-            
-            sidebar.classList.remove('opacity-0', 'translate-x-10', 'pointer-events-none');
-            sidebar.classList.add('opacity-100', 'translate-x-0', 'pointer-events-auto');
-        }
-
-        function closePrompt() {
-            const sidebar = document.getElementById('promptSidebar');
-            sidebar.classList.add('opacity-0', 'translate-x-10', 'pointer-events-none');
-            sidebar.classList.remove('opacity-100', 'translate-x-0', 'pointer-events-auto');
-        }
-
-        // --- ORIGINAL FUNCTIONALITY ---
-        function editFamilyName(element) {
-            const familyNameEl = document.getElementById('familyName');
-            const currentName = familyNameEl.textContent.trim().replace(/\s*Edit$/, '');
-            let newName = prompt("Enter new family name:", currentName);
-            if (newName !== null && newName.trim() !== "") {
-                familyNameEl.textContent = newName.trim();
+        // Stories Content (Chinese)
+        const stories = {
+            1: {
+                title: "Family Scoop (Standard)",
+                content: "爸爸一早就在处理邮件和看视频☕<br>妈妈在做家务的间隙刷了刷社交媒体📱<br>孩子们在做作业和看短视频之间切换🎓<br>晚上，全家人都在看流媒体和刷屏📺<br>这是工作、学习和放松平衡的一天✨",
+                icon: "fa-newspaper",
+                color: "text-orange-600 bg-orange-100"
+            },
+            2: {
+                title: "Gamified Story",
+                content: "早晨的任务从工作邮件和学校视频开始🎮<br>中午，任务清空，技能升级<br>下午的游戏时间解锁了娱乐和聊天<br>夜间模式开启，全家进入流媒体和深夜刷屏状态🌙<br>所有玩家成功下线",
+                icon: "fa-gamepad",
+                color: "text-purple-600 bg-purple-100"
+            },
+            3: {
+                title: "Family Gossip",
+                content: "爸爸一直忠于工作App，偶尔偷看视频👀<br>妈妈整天都在刷社交动态<br>孩子们在网课和游戏之间反复横跳<br>晚饭后，大家都安静了——屏幕亮着，灯光暗着📱<br>典型的家庭网络剧",
+                icon: "fa-comments",
+                color: "text-rose-600 bg-rose-100"
+            },
+            4: {
+                title: "Behavior Insight",
+                content: "早晨的活动偏向于生产力和学习<br>中午的使用量较少且碎片化<br>下午混合了学习和娱乐<br>晚上显示全家人的屏幕时间高度同步📊<br>作息清晰，冲突极少",
+                icon: "fa-magnifying-glass-chart",
+                color: "text-teal-600 bg-teal-100"
+            },
+            5: {
+                title: "Atmospheric",
+                content: "一天在宁静中开始，屏幕随着房子一起苏醒🌅<br>信号在共享的日常中流动<br>午后充满了欢笑、专注和停顿<br>夜晚，柔和的光线和稳定的数据流占据了一切✨<br>家在网络中休憩",
+                icon: "fa-cloud-moon",
+                color: "text-amber-600 bg-amber-100"
             }
-        }
+        };
 
+        // Chart Data
         const dataA = {
             chartData: [90, 15, 10, 5, 5, 30],
             title: "Cinema Paradise 🎬",
@@ -524,8 +495,10 @@ Language should feel calm and visual.`
             ]
         };
 
-        let currentMode = 'A';
+        let currentStoryId = 1;
         let myRadarChart = null;
+
+        // --- FUNCTIONS ---
 
         function initChart() {
             const ctx = document.getElementById('radarChart').getContext('2d');
@@ -564,14 +537,14 @@ Language should feel calm and visual.`
         }
 
         function switchMode(mode) {
-            currentMode = mode;
             const btnA = document.getElementById('btnA');
             const btnB = document.getElementById('btnB');
             const btnC = document.getElementById('btnC');
             
-            btnA.className = "w-full py-2 px-4 rounded-lg text-sm font-bold transition-all btn-inactive";
-            btnB.className = "w-full py-2 px-4 rounded-lg text-sm font-bold transition-all btn-inactive";
-            btnC.className = "w-full py-2 px-4 rounded-lg text-sm font-bold transition-all btn-inactive";
+            // Reset Buttons
+            [btnA, btnB, btnC].forEach(btn => {
+                btn.className = "w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2";
+            });
             
             let data;
             if(mode === 'A') {
@@ -606,30 +579,97 @@ Language should feel calm and visual.`
             myRadarChart.update();
         }
 
-        function showBadgeDetails(title, user, desc, totalDays, consecutiveDays) {
-            alert(`🏆 Achievement Unlocked: ${title}\n\nWinner: ${user}\nReason: ${desc}\n\nTotal days held: ${totalDays}\nConsecutive days: ${consecutiveDays}`);
+        function switchStory(id) {
+            currentStoryId = id;
+            const data = stories[id];
+            
+            // Update Sidebar Buttons
+            for(let i=1; i<=5; i++) {
+                const btn = document.getElementById(`storyBtn${i}`);
+                if(i === id) {
+                    btn.className = "w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-orange text-left flex items-center gap-2";
+                } else {
+                    btn.className = "w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2";
+                }
+            }
+
+            // Update Card Content with Animation
+            const contentEl = document.getElementById('storyContent');
+            const titleEl = document.getElementById('storyTitle');
+            const iconContainer = document.getElementById('storyIcon');
+            const icon = iconContainer.querySelector('i');
+
+            // Fade out effect simulation (simplified)
+            contentEl.innerHTML = data.content;
+            contentEl.classList.remove('fade-in');
+            void contentEl.offsetWidth; // trigger reflow
+            contentEl.classList.add('fade-in');
+
+            titleEl.innerText = data.title;
+            icon.className = `fa-solid ${data.icon}`;
+            iconContainer.className = `p-1.5 rounded-lg text-xs ${data.color}`;
         }
 
-        function toggleDetox(btn) {
-            const icon = btn.querySelector('i');
-            const span = btn.querySelector('span');
+        function showCurrentPrompt() {
+            const sidebar = document.getElementById('promptSidebar');
+            const content = document.getElementById('promptContent');
             
-            if (span.innerText === "Pause Internet") {
-                btn.classList.replace('bg-slate-800', 'bg-red-500');
-                btn.classList.replace('hover:bg-slate-700', 'hover:bg-red-400');
-                span.innerText = "Resume Internet";
-                icon.className = "fa-solid fa-play";
-                alert("⏸️ Internet paused for selected devices. Enjoy family time!");
-            } else {
-                btn.classList.replace('bg-red-500', 'bg-slate-800');
-                btn.classList.replace('hover:bg-red-400', 'hover:bg-slate-700');
-                span.innerText = "Pause Internet";
-                icon.className = "fa-solid fa-pause";
-                alert("▶️ Internet resumed.");
+            content.innerText = prompts[currentStoryId];
+            
+            sidebar.classList.remove('opacity-0', 'translate-x-10', 'pointer-events-none');
+            sidebar.classList.add('opacity-100', 'translate-x-0', 'pointer-events-auto');
+        }
+
+        function closePrompt() {
+            const sidebar = document.getElementById('promptSidebar');
+            sidebar.classList.add('opacity-0', 'translate-x-10', 'pointer-events-none');
+            sidebar.classList.remove('opacity-100', 'translate-x-0', 'pointer-events-auto');
+        }
+
+        function editFamilyName(element) {
+            const familyNameEl = document.getElementById('familyName');
+            const currentName = familyNameEl.textContent.trim().replace(/\s*Edit$/, '');
+            let newName = prompt("Enter new family name:", currentName);
+            if (newName !== null && newName.trim() !== "") {
+                familyNameEl.textContent = newName.trim();
             }
         }
 
-        window.onload = initChart;
+        function showBadgeDetails(title, user, desc, totalDays, consecutiveDays) {
+            const modal = document.getElementById('badgeModal');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalUser').innerText = user;
+            document.getElementById('modalDesc').innerText = desc;
+            document.getElementById('modalTotal').innerText = totalDays;
+            document.getElementById('modalStreak').innerText = consecutiveDays;
+            
+            const iconDiv = document.getElementById('modalIcon');
+            let icon = '🏆';
+            let colorClass = 'text-amber-500 border-amber-100 bg-amber-50';
+            
+            if (title.includes('Bird')) { icon = '🌅'; }
+            else if (title.includes('Owl')) { icon = '🦉'; colorClass = 'text-indigo-500 border-indigo-100 bg-indigo-50'; }
+            else if (title.includes('Monster')) { icon = '🦖'; colorClass = 'text-rose-500 border-rose-100 bg-rose-50'; }
+            else if (title.includes('Focus')) { icon = '🧘'; colorClass = 'text-blue-500 border-blue-100 bg-blue-50'; }
+            
+            iconDiv.innerHTML = icon;
+            iconDiv.className = `w-20 h-20 rounded-full flex items-center justify-center mb-4 text-4xl shadow-sm border-4 ${colorClass}`;
+            
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('visible-modal');
+        }
+
+        function closeBadgeModal() {
+            const modal = document.getElementById('badgeModal');
+            modal.classList.remove('visible-modal');
+            modal.classList.add('hidden-modal');
+        }
+
+        // Initialize
+        window.onload = function() {
+            initChart();
+            switchStory(1); // Load default story
+        };
     </script>
 </body>
 </html>
