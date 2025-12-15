@@ -64,10 +64,30 @@
             margin-left: 4px;
             cursor: pointer;
         }
+
+        .prompt-card {
+            transition: all 0.3s ease;
+        }
+        .prompt-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .expandable-text {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+        .expandable-text.expanded {
+            max-height: 300px;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen py-10 relative">
 
+    <!-- Mode Control Panel -->
     <div class="fixed top-6 left-6 z-50 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64">
         <h3 class="text-sm font-bold text-slate-400 uppercase mb-3">Leader View Control</h3>
         <div class="space-y-2">
@@ -82,7 +102,9 @@
             </button>
         </div>
     </div>
-    <div class="w-full max-w-[400px] bg-slate-50 h-[850px] rounded-[40px] shadow-2xl overflow-hidden border-[8px] border-slate-900 relative flex flex-col">
+
+    <!-- Main UI Container -->
+    <div id="mainContainer" class="w-full max-w-[400px] bg-slate-50 h-[850px] rounded-[40px] shadow-2xl overflow-hidden border-[8px] border-slate-900 relative flex flex-col">
         
         <div class="px-6 pt-4 pb-2 flex justify-between items-center text-xs font-bold text-slate-900 z-10 bg-slate-50">
             <span>9:41</span>
@@ -110,6 +132,7 @@
 
         <main class="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8 space-y-6">
 
+            <!-- Section 1 -->
             <section id="section1" class="relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br from-indigo-600 to-purple-700">
                 <div class="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl"></div>
                 
@@ -160,7 +183,8 @@
                 </div>
             </section>
 
-            <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+            <!-- Section 2 - Made Clickable -->
+            <section id="section2" class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 cursor-pointer" onclick="goToPromptSelection()">
                 <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-2">
                     <span class="bg-orange-100 text-orange-600 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-newspaper"></i></span>
                     <h3 class="font-bold text-slate-800 text-sm uppercase">Section 2: Miller's Scoop</h3>
@@ -190,6 +214,7 @@
                 </div>
             </section>
 
+            <!-- Other Sections -->
             <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
                 <div class="flex items-center gap-2 mb-4">
                     <span class="bg-green-100 text-green-600 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-bolt"></i></span>
@@ -324,6 +349,124 @@
         </nav>
     </div>
 
+    <!-- Prompt Selection View (Hidden by default) -->
+    <div id="promptSelectionContainer" class="hidden w-full max-w-[400px] bg-slate-50 h-[850px] rounded-[40px] shadow-2xl overflow-hidden border-[8px] border-slate-900 relative flex flex-col">
+        <div class="px-6 pt-4 pb-2 flex justify-between items-center text-xs font-bold text-slate-900 z-10 bg-slate-50">
+            <button onclick="goBack()" class="text-slate-700 hover:text-slate-900">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <div class="flex gap-1.5">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+        <header class="px-6 py-2 pb-4 bg-slate-50 flex justify-between items-center shrink-0">
+            <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Select a Style</h1>
+        </header>
+        <main class="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8 space-y-4">
+            <!-- Card 1 -->
+            <div class="prompt-card bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">1. 安全中性默认 🌞</h3>
+                        <p class="text-xs text-slate-600 mt-2">温和叙述，简洁安全，适度emoji</p>
+                    </div>
+                    <button onclick="togglePrompt(this)" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="expandable-text mt-3 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    根据以下家庭上网日志，生成今天的家庭网络故事，控制在70词以内。 
+                    故事视角：温和叙述者，平铺直叙。
+                    语言风格：简洁、温和、安全，可适度加入emoji。
+                    描述重点：家庭成员的上网行为及日常使用习惯，不夸张、不幽默、不评判。
+                    形式要求：覆盖全天，不要统计数字或排名，用几句话总结一天的网络活动。
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="prompt-card bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">2. 游戏化解说员 🎮</h3>
+                        <p class="text-xs text-slate-600 mt-2">游戏任务、闯关、升级、战利品</p>
+                    </div>
+                    <button onclick="togglePrompt(this)" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="expandable-text mt-3 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    根据以下家庭上网日志，生成今天的家庭网络故事，控制在70词以内。 
+                    故事视角：游戏解说员或冒险导师的视角。
+                    语言风格：趣味、充满能量，善用比喻和夸张，可加入emoji。
+                    描述重点：把每位家庭成员的上网行为比作游戏任务、闯关、升级、获得战利品，突出成就感和挑战感。
+                    形式要求：覆盖全天，用几句话串联所有活动，强调节奏和高峰时刻，不用数字排名。
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="prompt-card bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">3. 家庭八卦记者 📰</h3>
+                        <p class="text-xs text-slate-600 mt-2">八卦记者视角，带点评吐槽</p>
+                    </div>
+                    <button onclick="togglePrompt(this)" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="expandable-text mt-3 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    根据以下家庭上网日志，生成今天的家庭网络故事，控制在70词以内。
+                    故事视角：八卦记者，带点评和吐槽。
+                    语言风格：夸张、幽默、带趣味化语言，可加入emoji。
+                    描述重点：捕捉家庭成员的社交互动、娱乐行为或突发事件，把日常行为包装成趣味新闻或小八卦。
+                    形式要求：覆盖全天，不列流量数字，重点放事件和人物互动。
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="prompt-card bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">4. 行为洞察分析师 📊</h3>
+                        <p class="text-xs text-slate-600 mt-2">理性分析，行为模式与趋势</p>
+                    </div>
+                    <button onclick="togglePrompt(this)" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="expandable-text mt-3 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    根据以下家庭上网日志，生成今天的家庭网络故事，控制在70词以内。
+                    故事视角：行为分析师，观察者视角。
+                    语言风格：理性、清晰、逻辑性强，可适度加入emoji。
+                    描述重点：分析家庭成员全天的行为模式、应用使用习惯和时间分布，突出趋势和洞察，而非趣味或夸张。
+                    形式要求：覆盖全天，不列具体流量数字，用简短叙述表达观察结论。
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="prompt-card bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">5. 抽象/氛围流 🌌</h3>
+                        <p class="text-xs text-slate-600 mt-2">诗意叙事，数字世界流动感</p>
+                    </div>
+                    <button onclick="togglePrompt(this)" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="expandable-text mt-3 text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    根据以下家庭上网日志，生成今天的家庭网络故事，控制在70词以内。
+                    故事视角：诗意叙事者，描绘数字世界的流动。
+                    语言风格：抽象、意象化、富有氛围，可加入emoji。
+                    描述重点：通过比喻、意象、节奏和光影描写家庭成员全天的网络活动流动感，强调氛围和情绪，不强调具体应用和数据。
+                    形式要求：覆盖全天，用少量句子表现流动、起伏和节奏感。
+                </div>
+            </div>
+        </main>
+    </div>
+
     <script>
         // Make family name editable
         function editFamilyName(element) {
@@ -384,11 +527,11 @@
             const ctx = document.getElementById('radarChart').getContext('2d');
             myRadarChart = new Chart(ctx, {
                 type: 'radar',
-                 {
+                data: {
                     labels: ['Video', 'Game', 'Social', 'Work', 'Edu', 'Download'],
                     datasets: [{
                         label: 'Usage',
-                         dataA.chartData,
+                        data: dataA.chartData,
                         backgroundColor: 'rgba(255, 255, 255, 0.2)',
                         borderColor: 'rgba(255, 255, 255, 0.9)',
                         pointBackgroundColor: '#fff',
@@ -492,6 +635,30 @@
                 icon.className = "fa-solid fa-pause";
                 alert("▶️ Internet resumed.");
             }
+        }
+
+        // --- PROMPT CARD TOGGLE ---
+        function togglePrompt(button) {
+            const expandable = button.closest('.prompt-card').querySelector('.expandable-text');
+            const icon = button.querySelector('i');
+            if (expandable.classList.contains('expanded')) {
+                expandable.classList.remove('expanded');
+                icon.className = "fa-solid fa-chevron-down";
+            } else {
+                expandable.classList.add('expanded');
+                icon.className = "fa-solid fa-chevron-up";
+            }
+        }
+
+        // --- NAVIGATION ---
+        function goToPromptSelection() {
+            document.getElementById('mainContainer').classList.add('hidden');
+            document.getElementById('promptSelectionContainer').classList.remove('hidden');
+        }
+
+        function goBack() {
+            document.getElementById('promptSelectionContainer').classList.add('hidden');
+            document.getElementById('mainContainer').classList.remove('hidden');
         }
 
         // Initialize
