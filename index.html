@@ -305,19 +305,21 @@
                     </div>
                 </section>
 
-                <!-- Section 6: Network Statistics (Fixed Chart) -->
-                <section class="bg-slate-800 rounded-3xl p-5 text-white shadow-lg mb-10">
+                <!-- Section 6: Network Statistics (Combined) -->
+                <section class="bg-slate-800 rounded-3xl p-5 text-white shadow-lg transition-all" id="statsSection">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
-                            <span class="bg-emerald-500/20 text-emerald-400 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-chart-simple"></i></span>
-                            <h3 class="font-bold text-sm uppercase text-slate-200">Network Stats</h3>
+                             <span class="bg-emerald-500/20 text-emerald-400 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-chart-simple"></i></span>
+                             <h3 class="font-bold text-sm uppercase text-slate-200">Network Stats</h3>
                         </div>
-                        <span class="text-[10px] text-slate-500 bg-slate-900/50 px-2 py-1 rounded">Updated Just now</span>
+                        <div class="bg-slate-900/80 p-1 rounded-lg flex text-[10px] font-bold">
+                            <button onclick="switchStats('today')" id="btnStatsToday" class="px-3 py-1 rounded-md bg-white/10 text-white shadow-sm transition-all">Today</button>
+                            <button onclick="switchStats('history')" id="btnStatsHistory" class="px-3 py-1 rounded-md text-slate-500 hover:text-slate-300 transition-all">History</button>
+                        </div>
                     </div>
-                    
-                    <!-- Today -->
-                    <div class="mb-5">
-                        <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2 tracking-wider">Today (24h)</h4>
+
+                    <!-- Today View -->
+                    <div id="statsToday" class="block animate-fade-in">
                         <div class="grid grid-cols-2 gap-3">
                              <div class="bg-white/5 p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
                                  <div class="text-[10px] text-slate-400 uppercase">Total Traffic</div>
@@ -348,23 +350,99 @@
                         </div>
                     </div>
 
-                    <!-- History -->
-                    <div class="pt-3 border-t border-white/10">
-                        <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-wider">History (All Time)</h4>
-                        <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5 flex justify-between divide-x divide-white/10">
-                            <div class="px-2 text-center flex-1">
-                                <div class="text-[9px] text-slate-500 uppercase mb-1">Traffic</div>
-                                <div class="font-bold text-sm text-slate-200">4.2 TB</div>
+                    <!-- History View -->
+                    <div id="statsHistory" class="hidden animate-fade-in">
+                        <div class="p-3 bg-white/5 rounded-xl border border-white/10 mb-3">
+                            <div class="flex justify-between items-end mb-2">
+                                <div class="text-[10px] text-slate-400 uppercase">All-Time Traffic</div>
+                                <div class="text-2xl font-bold text-purple-400">4.2 TB</div>
                             </div>
-                            <div class="px-2 text-center flex-1">
-                                <div class="text-[9px] text-slate-500 uppercase mb-1">Time</div>
-                                <div class="font-bold text-sm text-slate-200">1.2k Hr</div>
-                            </div>
-                             <div class="px-2 text-center flex-1">
-                                <div class="text-[9px] text-slate-500 uppercase mb-1">Apps</div>
-                                <div class="font-bold text-sm text-slate-200">156</div>
+                            <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-purple-500 h-full rounded-full" style="width: 75%"></div>
                             </div>
                         </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                                <div class="text-[10px] text-slate-400 uppercase mb-1">Total Time</div>
+                                <div class="text-xl font-bold text-slate-200">1.2k <span class="text-xs font-normal text-slate-500">Hrs</span></div>
+                            </div>
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                                <div class="text-[10px] text-slate-400 uppercase mb-1">Unique Apps</div>
+                                <div class="text-xl font-bold text-slate-200">156</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-white/10 text-center">
+                            <p class="text-[10px] text-slate-500">Data collected since Jan 1, 2023</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 7: Family Time (Disconnect) -->
+                <section id="sectionFamilyTime" class="bg-slate-800 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden mb-8 border border-slate-700 transition-colors duration-500">
+                    <!-- Background Decor -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+                    <!-- Header -->
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                            <span>🕒</span> Family Challenge
+                        </h3>
+                        <button onclick="toggleFamilySettings()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition-colors text-slate-300 font-bold border border-white/5">
+                            <i class="fa-solid fa-sliders mr-1"></i> Custom
+                        </button>
+                    </div>
+
+                    <!-- State 1: Challenge Intro (Default) -->
+                    <div id="familyTimeSetup" class="relative z-10 transition-all duration-300">
+                        
+                        <div class="mb-6">
+                            <p class="text-sm text-slate-300 font-medium leading-relaxed">
+                                Can your family survive <span class="text-white font-bold decoration-indigo-500 underline decoration-2 underline-offset-2" id="challengeDurationText">60 minutes</span> without Wi-Fi?
+                            </p>
+                            <p class="text-sm text-slate-400 mt-2 font-medium">
+                                No scrolling. No streaming. <br>
+                                <span class="text-indigo-300 font-bold">Just real life.</span> 🌿
+                            </p>
+                        </div>
+
+                        <!-- Hidden Settings (Toggleable) -->
+                        <div id="familySettings" class="hidden mb-4 bg-black/20 p-3 rounded-xl border border-white/5 animate-fade-in">
+                             <div class="flex justify-between items-center mb-2">
+                                <span class="text-[10px] uppercase font-bold text-slate-400">Duration</span>
+                                <div class="flex gap-1">
+                                    <button onclick="selectDuration(30, this)" class="duration-btn px-2 py-1 rounded bg-white/5 text-[10px] text-slate-300 border border-white/5 hover:bg-white/10">30m</button>
+                                    <button onclick="selectDuration(60, this)" class="duration-btn px-2 py-1 rounded bg-indigo-600 text-[10px] text-white border border-indigo-500 ring-1 ring-indigo-400 shadow-sm">60m</button>
+                                    <button onclick="selectDuration(120, this)" class="duration-btn px-2 py-1 rounded bg-white/5 text-[10px] text-slate-300 border border-white/5 hover:bg-white/10">2h</button>
+                                </div>
+                             </div>
+                             <div class="flex justify-between items-center">
+                                <span class="text-[10px] uppercase font-bold text-slate-400">Devices</span>
+                                <span class="text-[10px] text-slate-300 flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i> All Devices</span>
+                             </div>
+                        </div>
+
+                        <button onclick="startFamilyTime()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-bold text-sm shadow-xl shadow-indigo-900/50 active:scale-95 transition-all flex items-center justify-center gap-2 group border border-white/10">
+                            <i class="fa-solid fa-flag-checkered group-hover:rotate-12 transition-transform"></i>
+                            Start the Challenge
+                        </button>
+                    </div>
+
+                    <!-- State 2: Active (Countdown) -->
+                    <div id="familyTimeActive" class="hidden relative z-10 flex flex-col items-center justify-center py-2 animate-fade-in">
+                        <div class="text-center mb-6">
+                            <div class="inline-block px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-bold uppercase tracking-widest mb-3 border border-indigo-500/30">Challenge In Progress</div>
+                            <div id="countdownDisplay" class="text-5xl font-extrabold text-white font-mono tracking-tighter tabular-nums drop-shadow-lg">60:00</div>
+                        </div>
+                        
+                        <div class="w-full bg-slate-700/50 rounded-full h-3 mb-6 overflow-hidden border border-white/5">
+                            <div id="countdownProgress" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000 ease-linear shadow-[0_0_15px_rgba(99,102,241,0.5)]" style="width: 100%"></div>
+                        </div>
+
+                        <button onclick="cancelFamilyTime()" class="px-6 py-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-300 text-xs font-bold border border-white/5 hover:border-red-500/30 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-xmark"></i> Give Up
+                        </button>
                     </div>
                 </section>
 
@@ -608,6 +686,111 @@
             titleEl.innerText = data.title;
             icon.className = `fa-solid ${data.icon}`;
             iconContainer.className = `p-1.5 rounded-lg text-xs ${data.color}`;
+
+            // Sync prompt if open
+            const sidebar = document.getElementById('promptSidebar');
+            if (sidebar.classList.contains('opacity-100')) {
+                 document.getElementById('promptContent').innerText = prompts[id];
+            }
+        }
+
+        function switchStats(tab) {
+            const btnToday = document.getElementById('btnStatsToday');
+            const btnHistory = document.getElementById('btnStatsHistory');
+            const viewToday = document.getElementById('statsToday');
+            const viewHistory = document.getElementById('statsHistory');
+            
+            if(tab === 'today') {
+                btnToday.className = "px-3 py-1 rounded-md bg-white/10 text-white shadow-sm transition-all";
+                btnHistory.className = "px-3 py-1 rounded-md text-slate-500 hover:text-slate-300 transition-all";
+                viewToday.classList.remove('hidden');
+                viewHistory.classList.add('hidden');
+            } else {
+                btnToday.className = "px-3 py-1 rounded-md text-slate-500 hover:text-slate-300 transition-all";
+                btnHistory.className = "px-3 py-1 rounded-md bg-white/10 text-white shadow-sm transition-all";
+                viewToday.classList.add('hidden');
+                viewHistory.classList.remove('hidden');
+            }
+        }
+
+        // Global vars for Family Time
+        let familyTimeDuration = 60; // default minutes
+        let familyTimerInterval = null;
+        let familyTimeRemaining = 0;
+
+        function toggleFamilySettings() {
+            const settings = document.getElementById('familySettings');
+            settings.classList.toggle('hidden');
+        }
+
+        function selectDuration(minutes, btn) {
+            familyTimeDuration = minutes;
+            
+            // Update Text
+            const textEl = document.getElementById('challengeDurationText');
+            if(textEl) textEl.innerText = `${minutes} minutes`;
+
+            // Update UI
+            document.querySelectorAll('.duration-btn').forEach(b => {
+                b.className = "duration-btn px-2 py-1 rounded bg-white/5 text-[10px] text-slate-300 border border-white/5 hover:bg-white/10";
+            });
+            btn.className = "duration-btn px-2 py-1 rounded bg-indigo-600 text-[10px] text-white border border-indigo-500 ring-1 ring-indigo-400 shadow-sm";
+        }
+
+        function startFamilyTime() {
+            const setupView = document.getElementById('familyTimeSetup');
+            const activeView = document.getElementById('familyTimeActive');
+            const section = document.getElementById('sectionFamilyTime');
+
+            // UI Transitions
+            setupView.classList.add('hidden');
+            activeView.classList.remove('hidden');
+            
+            // Change BG to active state
+            section.className = "bg-indigo-950 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden mb-8 border border-indigo-500/30 transition-colors duration-500";
+
+            // Timer Logic
+            familyTimeRemaining = familyTimeDuration * 60; // seconds
+            updateTimerDisplay();
+            
+            if(familyTimerInterval) clearInterval(familyTimerInterval);
+            familyTimerInterval = setInterval(() => {
+                familyTimeRemaining--;
+                updateTimerDisplay();
+                if(familyTimeRemaining <= 0) {
+                    cancelFamilyTime(); // End when done
+                    alert("Family Challenge Complete!");
+                }
+            }, 1000);
+        }
+
+        function cancelFamilyTime() {
+            const setupView = document.getElementById('familyTimeSetup');
+            const activeView = document.getElementById('familyTimeActive');
+            const section = document.getElementById('sectionFamilyTime');
+
+            if(familyTimerInterval) clearInterval(familyTimerInterval);
+
+            // UI Transitions
+            activeView.classList.add('hidden');
+            setupView.classList.remove('hidden');
+
+            // Revert BG
+            section.className = "bg-slate-800 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden mb-8 border border-slate-700 transition-colors duration-500";
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('countdownDisplay');
+            const progress = document.getElementById('countdownProgress');
+            
+            const m = Math.floor(familyTimeRemaining / 60);
+            const s = familyTimeRemaining % 60;
+            
+            display.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            
+            const totalSeconds = familyTimeDuration * 60;
+            const pct = (familyTimeRemaining / totalSeconds) * 100;
+            progress.style.width = `${pct}%`;
         }
 
         function showCurrentPrompt() {
