@@ -492,51 +492,127 @@
 
     </div>
 
-    <script>
-        // --- DATA & CONFIG ---
-        
-        // Prompts (Chinese)
-        const prompts = {
-            1: "基于全天的家庭网络日志，生成一个中立、友好的“今日网络故事”。\n总结全天的工作、学习和娱乐情况。\n限制在60字以内。\n每行一句话。\n最多使用5个表情符号。\n避免数字和繁重的统计数据。\n语气：平静、平衡、适合家庭。",
-            2: "将今天的家庭网络活动变成一个轻松的游戏化故事。\n把一天描述为关卡、任务或回合。\n涵盖从早到晚。\n60字以内。\n每行一句话。\n最多5个表情符号。\n语气：顽皮、充满活力。",
-            3: "像写轻松的八卦专栏一样写今天的家庭网络故事。\n关注“谁在线上做了什么”。\n保持顽皮，不要评判。\n60字以内。\n每行一句话。\n避免数字。",
-            4: "从行为洞察的角度总结今天的家庭网络使用情况。\n关注模式和节奏，而不是细节。\n涵盖从早到晚。\n60字以内。\n每行一句话。\n语气：观察性、深思熟虑。",
-            5: "基于全天的家庭网络活动创建一个抽象、充满氛围的故事。\n关注情绪和流动，而不是具体行动。\n60字以内。\n每行一句话。\n语言感觉平静且具象。"
-        };
+<script>
+    // --- DATA & CONFIG ---
+    
+    // Prompts (English)
+    const prompts = {
+        1: `Standard
+Role:
+You are a storyteller summarizing daily family internet usage in a clear, engaging way.
 
-        // Stories Content (Chinese)
-        const stories = {
-            1: {
-                title: "Family Scoop (Standard)",
-                content: "爸爸一早就在处理邮件和看视频☕<br>妈妈在做家务的间隙刷了刷社交媒体📱<br>孩子们在做作业和看短视频之间切换🎓<br>晚上，全家人都在看流媒体和刷屏📺<br>这是工作、学习和放松平衡的一天✨",
-                icon: "fa-newspaper",
-                color: "text-orange-600 bg-orange-100"
-            },
-            2: {
-                title: "Gamified Story",
-                content: "早晨的任务从工作邮件和学校视频开始🎮<br>中午，任务清空，技能升级<br>下午的游戏时间解锁了娱乐和聊天<br>夜间模式开启，全家进入流媒体和深夜刷屏状态🌙<br>所有玩家成功下线",
-                icon: "fa-gamepad",
-                color: "text-purple-600 bg-purple-100"
-            },
-            3: {
-                title: "Family Gossip",
-                content: "爸爸一直忠于工作App，偶尔偷看视频👀<br>妈妈整天都在刷社交动态<br>孩子们在网课和游戏之间反复横跳<br>晚饭后，大家都安静了——屏幕亮着，灯光暗着📱<br>典型的家庭网络剧",
-                icon: "fa-comments",
-                color: "text-rose-600 bg-rose-100"
-            },
-            4: {
-                title: "Behavior Insight",
-                content: "早晨的活动偏向于生产力和学习<br>中午的使用量较少且碎片化<br>下午混合了学习和娱乐<br>晚上显示全家人的屏幕时间高度同步📊<br>作息清晰，冲突极少",
-                icon: "fa-magnifying-glass-chart",
-                color: "text-teal-600 bg-teal-100"
-            },
-            5: {
-                title: "Atmospheric",
-                content: "一天在宁静中开始，屏幕随着房子一起苏醒🌅<br>信号在共享的日常中流动<br>午后充满了欢笑、专注和停顿<br>夜晚，柔和的光线和稳定的数据流占据了一切✨<br>家在网络中休憩",
-                icon: "fa-cloud-moon",
-                color: "text-amber-600 bg-amber-100"
-            }
-        };
+Task:
+From the provided 【Family Internet Usage Log】, generate a concise family network story.
+
+Requirements:
+- Standard narrative style, but allow slight digressions or playful connections between events.
+- Focus on interactions, overlaps, and sudden changes in usage, not strict chronology.
+- Make it fun, interesting, and creative; exaggerate contrasts if helpful.
+- Length: ≤ 70 words. After generating, check and ensure the output does not exceed this limit.
+- Optional: sprinkle emojis lightly for readability.`,
+
+        2: `Gossip
+Role:
+You are a playful family gossip reporter writing “Family Internet Headlines” for a mobile app.
+
+Task:
+From the provided 【Family Internet Usage Log】, write 3 short, humorous news flashes about the family’s online activity.
+
+Requirements:
+- Tone: Energetic, exaggerated news style 🎤
+- Number of flashes: 3
+- Each flash: 2–3 sentences, total ≤ 70 words
+- Focus on changes and contrasts:
+  • Parents caught online at unusual times 🤫
+  • Kids consuming lots of data 🎮📉
+  • Family streaming binges
+- Highlight only the most “newsworthy” moments
+- Do not invent apps or actions
+- Emojis allowed for humor and drama`,
+
+        3: `Gaming
+Role:
+You are a playful game commentator reporting on a family’s daily internet activity as if it were a live multiplayer game.
+
+Task:
+From the provided 【Family Internet Usage Log】, write 3 short game-style “battle reports” or “quest updates” about the family’s online activity.
+
+Requirements:
+- Tone: Energetic, game-like 🎮⚔️
+- Number of flashes: 3
+- Each flash: 2–3 sentences, ≤ 70 words
+- Focus on unusual events or spikes:
+  • Parents suddenly “entering the arena” during work hours
+  • Kids unleashing “data combos” or “epic binge sessions”
+  • Family streaming or device swarms
+- Do not invent apps or actions, only exaggerate style
+- Use emojis to enhance the gaming feel`,
+
+        4: `Behavior
+Role:
+You are a playful family network analyst summarizing daily internet usage.
+
+Task:
+From the provided 【Family Internet Usage Log】, generate a concise, fun, and insightful summary of today's family online behavior.
+
+Requirements:
+- Focus on patterns, rhythms, interactions, and unusual spikes, not detailed logs.
+- Highlight interesting family dynamics: parents’ sudden usage bursts, kids’ streaming raids, overlapping device activity, and any unexpected peaks.
+- Tone: light, witty, and engaging.
+- Length: ≤ 70 words.
+- Output: 3 short observations or “insight bullets”.
+- Emojis optional.`,
+
+        5: `Atmospheric
+Role:
+You are a poetic family network storyteller.
+
+Task:
+From the provided 【Family Internet Usage Log】, craft a short, whimsical story of the day’s online rhythm.
+
+Requirements:
+- Focus on patterns, flows, interactions, and sudden bursts, not detailed logs.
+- Use poetic and atmospheric language.
+- Highlight spikes, overlaps, or unexpected peaks.
+- Tone: light, fun, and engaging.
+- Length: ≤ 70 words.
+- Output: 3–4 short sentences capturing the mood of the day.`
+    };
+
+    // Stories Content (English)
+    const stories = {
+        1: {
+            title: "Family Scoop (Standard)",
+            content: "The household pulses with digital energy ⚡—parents dart between work and social feeds, their screens flaring in bursts, while kids ride waves of YouTube, TikTok, and Roblox 🌊🎮.<br>Evenings glow with Netflix and Hulu marathons 🍿📺, devices overlapping, notifications pinging, a lively symphony of clicks, swipes, and streaming that dances through the family home.",
+            icon: "fa-newspaper",
+            color: "text-orange-600 bg-orange-100"
+        },
+        2: {
+            title: "Family Gossip",
+            content: "🕵️ Early-Bird Alert! Dad hits Gmail at 6:45AM, Mom scrolls Insta right after ☀️—who knew mornings were this wild?<br><br>🎮 Data Tsunami! Kids gobble YouTube, TikTok, Roblox, and Fortnite 📉💥—Child-2 alone burns over 1GB before dinner!<br><br>🍿 Binge Battle! Netflix showdown at 18:10—Mom, Dad, and Child-1 stack up 4,500MB in prime-time chaos 😱📺.",
+            icon: "fa-comments",
+            color: "text-rose-600 bg-rose-100"
+        },
+        3: {
+            title: "Game Commentary",
+            content: "⚔️ Early Arena Entry! Dad sneaks into Gmail and Google News at dawn 🌅, while Mom levels up her Insta scroll—morning raid complete!<br><br>🔥 Kid Data Combo! Child-2 unleashes TikTok + Roblox + Fortnite, hitting an epic 1.5GB combo 📉🎮—Wi-Fi barely survives!<br><br>🍿 Streaming Siege! 18:10 prime-time battle—Mom, Dad, and Child-1 swarm Netflix & Hulu 🛡️📺, devouring 4,500MB in one epic session!",
+            icon: "fa-gamepad",
+            color: "text-purple-600 bg-purple-100"
+        },
+        4: {
+            title: "Behavior Insight",
+            content: "• Morning Sprint: Parents kick off with Gmail, News, and Instagram ☀️📱, while kids dive into YouTube and TikTok early.<br>• Afternoon Data Blitz: Child-2’s Roblox and Xbox spikes 🔥🎮 collide with Child-1’s YouTube and Discord raids.<br>• Prime-Time Streaming Party: Evening brings a full-family Netflix/Hulu binge 🍿📺—device overlap peaks, screen-time XP unlocked.",
+            icon: "fa-magnifying-glass-chart",
+            color: "text-teal-600 bg-teal-100"
+        },
+        5: {
+            title: "Atmospheric",
+            content: "Screens awaken with the house 🌅, signals drifting between focus and play.<br>Data swells, overlaps, then softens into shared streams.<br>By night, glowing rectangles hum in quiet harmony ✨—the network exhales, and the home rests.",
+            icon: "fa-cloud-moon",
+            color: "text-amber-600 bg-amber-100"
+        }
+    };
+
 
         // Chart Data
         const dataA = {
