@@ -118,16 +118,16 @@
     </div>
 
     <!-- PROMPT SIDEBAR (Right Side) -->
-    <div id="promptSidebar" class="fixed top-1/2 -translate-y-1/2 right-6 xl:right-20 z-40 w-80 bg-white p-6 rounded-2xl shadow-2xl border border-slate-200 opacity-0 translate-x-10 pointer-events-none transition-all duration-500">
+    <div id="promptSidebar" class="fixed top-1/2 -translate-y-1/2 right-6 xl:right-20 z-40 w-96 bg-white p-6 rounded-2xl shadow-2xl border border-slate-200 opacity-0 translate-x-10 pointer-events-none transition-all duration-500">
         <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Prompt Details</h3>
             <button onclick="closePrompt()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="space-y-3">
             <div class="text-[10px] font-bold text-slate-400 uppercase">Input Prompt (Chinese)</div>
-            <div id="promptContent" class="text-sm text-slate-600 leading-relaxed font-mono bg-slate-50 p-3 rounded-lg border border-slate-100">
-                Select a story to view the underlying prompt.
-            </div>
+            <div id="promptContent" class="text-xs text-slate-600 leading-normal font-mono bg-slate-50 p-3 rounded-lg border border-slate-100">
+    Select a story to view the underlying prompt.
+        </div>
         </div>
         <div class="mt-4 pt-2 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-400">
             <i class="fa-solid fa-robot"></i>
