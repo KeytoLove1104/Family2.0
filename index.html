@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Insight - Digital Vibe</title>
+    <title>Family Insight - Dashboard</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -70,26 +70,22 @@
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Avatar Breathing Animation for Online Users */
-        @keyframes breathe {
-            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-            70% { box-shadow: 0 0 0 8px rgba(255, 255, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
-        .online-glow {
-            animation: breathe 3s infinite;
-        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen py-10 relative overflow-x-hidden">
 
     <div class="fixed top-6 left-6 z-50 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64 hidden xl:block h-[850px] overflow-y-auto hide-scrollbar">
-        <h3 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Control Panel</h3>
+        <h3 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Metric Control</h3>
         <div class="space-y-2 mb-6">
-            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 text-[10px] text-slate-500">
-                <p><strong>Note:</strong> The "Digital Vibe" section now visualizes presence. Toggle "Member View" via the device tabs.</p>
-            </div>
+            <button onclick="switchMode('A')" id="btnA" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-purple text-left flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie w-4"></i> Plan A: Traffic (流量)
+            </button>
+            <button onclick="switchMode('B')" id="btnB" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
+                <i class="fa-solid fa-clock w-4"></i> Plan B: Time (时长)
+            </button>
+            <button onclick="switchMode('C')" id="btnC" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
+                <i class="fa-solid fa-bolt w-4"></i> Plan C: Active (活跃)
+            </button>
         </div>
 
         <div class="border-t border-slate-100 pt-4 mb-2">
@@ -111,6 +107,10 @@
                     <i class="fa-solid fa-cloud-moon w-4"></i> Atmospheric (氛围故事)
                 </button>
             </div>
+        </div>
+        
+        <div class="mt-6 p-3 bg-slate-50 rounded-lg border border-slate-100 text-[10px] text-slate-400 leading-relaxed">
+            <i class="fa-solid fa-info-circle mr-1"></i> Use these controls to toggle the display modes on the main device view.
         </div>
     </div>
 
@@ -144,63 +144,57 @@
 
         <div id="homeView" class="flex flex-col h-full w-full absolute top-0 left-0 pt-[44px] transition-transform duration-300 ease-in-out bg-slate-50">
             
-            <header class="px-6 py-2 pb-0 bg-slate-50 flex flex-col gap-4 shrink-0">
-                <div class="flex justify-center w-full">
-                    <div class="bg-slate-200/80 p-1 rounded-full flex text-[11px] font-bold w-full max-w-[240px] relative">
-                        <div id="tabHighlight" class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white rounded-full shadow-sm transition-all duration-300 ease-out z-0"></div>
-                        <button onclick="switchMainView('family')" id="tabFamily" class="flex-1 py-1.5 rounded-full text-slate-800 relative z-10 transition-colors text-center">
-                            Family
-                        </button>
-                        <button onclick="switchMainView('member')" id="tabMember" class="flex-1 py-1.5 rounded-full text-slate-400 relative z-10 transition-colors text-center">
-                            Members
-                        </button>
-                    </div>
+            <header class="px-6 py-2 pb-4 bg-slate-50 flex justify-between items-center shrink-0">
+                <div class="editable" onclick="editFamilyName(this)">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Family Insight</div>
+                    <h1 id="familyName" class="text-2xl font-extrabold text-slate-800 tracking-tight inline-block">
+                        The Millers
+                        <span class="edit-icon text-slate-400">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </span>
+                    </h1>
                 </div>
-
-                <div class="flex justify-between items-center">
-                    <div class="editable" onclick="editFamilyName(this)">
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Family Insight</div>
-                        <h1 id="familyName" class="text-2xl font-extrabold text-slate-800 tracking-tight inline-block">
-                            The Millers
-                            <span class="edit-icon text-slate-400">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </span>
-                        </h1>
-                    </div>
-                    <div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white shadow-sm cursor-pointer hover:scale-105 transition-transform">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="Admin">
-                    </div>
+                <div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white shadow-sm">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="Admin">
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto hide-scrollbar px-5 py-4 space-y-6 relative">
+            <main class="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8 space-y-6 relative">
 
-                <section id="section1" class="relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br from-indigo-600 to-violet-700 min-h-[260px] flex flex-col justify-between group">
-                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity"></div>
-                    <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/20 to-transparent"></div>
-
-                    <div class="relative z-10 flex justify-between items-start">
-                        <div>
-                            <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider">The Digital Vibe</p>
-                            <h2 id="vibeTitle" class="text-xl font-bold flex items-center gap-2">
-                                Living Room <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                            </h2>
+                <section id="section1" class="relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br from-indigo-600 to-purple-700">
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl"></div>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-1">
+                            <div>
+                                <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider">The Digital Vibe</p>
+                                <h2 id="vibeTitle" class="text-xl font-bold">Cinema Paradise 🎬</h2>
+                            </div>
+                            <span id="vibeBadge" class="bg-white/20 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold border border-white/10">Traffic Analysis</span>
                         </div>
-                        <button class="bg-white/20 hover:bg-white/30 backdrop-blur-md px-2.5 py-1.5 rounded-full text-[10px] font-bold border border-white/10 transition-colors">
-                            <i class="fa-solid fa-house-signal"></i> Network
-                        </button>
-                    </div>
-
-                    <div class="relative z-10 flex-1 flex items-end justify-around pb-2 pt-6" id="familyPortraitContainer">
+                        <div class="flex items-center mt-2">
+                            <div class="w-[180px] h-[180px] relative -ml-2">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                            <div class="flex-1 pl-2 space-y-3">
+                                <div class="group">
+                                    <div class="flex justify-between text-xs text-indigo-100 mb-0.5"><span id="label1">Video</span><span id="val1" class="font-bold text-white">90 GB</span></div>
+                                    <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden"><div id="bar1" class="h-full bg-amber-400 rounded-full" style="width: 90%"></div></div>
+                                </div>
+                                <div class="group">
+                                    <div class="flex justify-between text-xs text-indigo-100 mb-0.5"><span id="label2">Download</span><span id="val2" class="font-bold text-white">30 GB</span></div>
+                                    <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden"><div id="bar2" class="h-full bg-pink-400 rounded-full" style="width: 70%"></div></div>
+                                </div>
+                                <div class="group">
+                                    <div class="flex justify-between text-xs text-indigo-100 mb-0.5"><span id="label3">Game</span><span id="val3" class="font-bold text-white">15 GB</span></div>
+                                    <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden"><div id="bar3" class="h-full bg-cyan-400 rounded-full" style="width: 30%"></div></div>
+                                </div>
+                            </div>
                         </div>
-
-                    <div class="relative z-10 mt-2 pt-3 border-t border-white/10 flex justify-between items-center text-[10px] text-indigo-100">
-                        <span><i class="fa-solid fa-users mr-1"></i> 3 Online</span>
-                        <span>Bandwidth: 125 Mbps</span>
                     </div>
                 </section>
 
                 <section id="storySection" class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 transition-all duration-300">
+                    
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex items-center gap-2">
                             <span id="storyIcon" class="bg-orange-100 text-orange-600 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-newspaper"></i></span>
@@ -210,6 +204,7 @@
                             <i class="fa-solid fa-terminal mr-1"></i>Prompt
                         </button>
                     </div>
+                    
                     <div id="storyContent" class="mt-2 text-sm text-slate-600 leading-relaxed font-medium">
                         </div>
                 </section>
@@ -235,6 +230,41 @@
                     </div>
                 </section>
 
+                <section class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-5 text-white shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-sm uppercase text-slate-400">Digital Sync</h3>
+                        <button class="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors text-slate-300">
+                            <i class="fa-solid fa-user-group mr-1"></i> Switch
+                        </button>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-4 border border-white/20 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-16 h-16 bg-pink-500 blur-2xl opacity-20"></div>
+                        
+                        <div class="flex items-center justify-between mb-3 px-2">
+                            <div class="flex flex-col items-center">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" class="w-10 h-10 rounded-full bg-slate-200 border-2 border-slate-800 shadow-lg">
+                                <span class="text-[10px] mt-1 text-slate-400 font-bold">Dad</span>
+                            </div>
+                            
+                            <div class="flex flex-col items-center flex-1 px-4">
+                                <span class="text-2xl font-bold text-pink-400 mb-1">85%</span>
+                                <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-gradient-to-r from-pink-500 to-purple-500 h-full rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-center">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Molly" class="w-10 h-10 rounded-full bg-slate-200 border-2 border-slate-800 shadow-lg">
+                                <span class="text-[10px] mt-1 text-slate-400 font-bold">Mom</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-[10px] text-slate-200 leading-relaxed text-center opacity-90">
+                            Your compatibility is very high! You both enjoy visiting YouTube and surfing the web at night.
+                        </p>
+                    </div>
+                </section>
+
                 <section>
                     <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Daily Awards</h3>
                     <div class="grid grid-cols-2 gap-3">
@@ -247,6 +277,87 @@
                             <div class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-indigo-100">🦉</div>
                             <span class="text-[10px] text-slate-400 font-bold uppercase">Night Owl</span>
                             <span class="text-sm font-bold text-slate-800">Kevin</span>
+                        </div>
+                        <div onclick="showBadgeDetails('Data Monster', 'Jack', 'Consumed 42GB today.', '2', '1')" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                            <div class="w-10 h-10 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-rose-100">🦖</div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Data Monster</span>
+                            <span class="text-sm font-bold text-slate-800">Jack</span>
+                        </div>
+                        <div onclick="showBadgeDetails('Focus Master', 'Dad', '6h of Office Apps.', '10', '7')" class="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col items-center text-center shadow-sm active:scale-95 transition cursor-pointer">
+                            <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-2 text-lg shadow-sm border border-blue-100">🧘</div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Focus Master</span>
+                            <span class="text-sm font-bold text-slate-800">Dad</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-slate-800 rounded-3xl p-5 text-white shadow-lg transition-all" id="statsSection">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                             <span class="bg-emerald-500/20 text-emerald-400 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-chart-simple"></i></span>
+                             <h3 class="font-bold text-sm uppercase text-slate-200">Network Stats</h3>
+                        </div>
+                        <div class="bg-slate-900/80 p-1 rounded-lg flex text-[10px] font-bold">
+                            <button onclick="switchStats('today')" id="btnStatsToday" class="px-3 py-1 rounded-md bg-white/10 text-white shadow-sm transition-all">Today</button>
+                            <button onclick="switchStats('history')" id="btnStatsHistory" class="px-3 py-1 rounded-md text-slate-500 hover:text-slate-300 transition-all">History</button>
+                        </div>
+                    </div>
+
+                    <div id="statsToday" class="block animate-fade-in">
+                        <div class="grid grid-cols-2 gap-3">
+                             <div class="bg-white/5 p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+                                 <div class="text-[10px] text-slate-400 uppercase">Total Traffic</div>
+                                 <div class="text-xl font-bold text-emerald-400 my-0.5">145 GB</div>
+                                 <div class="text-[9px] text-slate-500">Video 90GB · Game 40GB</div>
+                             </div>
+                             <div class="bg-white/5 p-3 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+                                 <div class="text-[10px] text-slate-400 uppercase">Total Time</div>
+                                 <div class="text-xl font-bold text-blue-400 my-0.5">32.5 Hrs</div>
+                                 <div class="text-[9px] text-slate-500">Across 8 devices</div>
+                             </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-3">
+                             <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex justify-between items-center hover:bg-white/10 transition-colors">
+                                 <div>
+                                    <div class="text-[10px] text-slate-400 uppercase">Online Devices</div>
+                                    <div class="text-lg font-bold">8</div>
+                                 </div>
+                                 <i class="fa-solid fa-laptop text-slate-600 text-lg"></i>
+                             </div>
+                             <div class="bg-white/5 p-3 rounded-xl border border-white/10 flex justify-between items-center hover:bg-white/10 transition-colors">
+                                 <div>
+                                    <div class="text-[10px] text-slate-400 uppercase">Apps Visited</div>
+                                    <div class="text-lg font-bold">42</div>
+                                 </div>
+                                 <i class="fa-solid fa-layer-group text-slate-600 text-lg"></i>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div id="statsHistory" class="hidden animate-fade-in">
+                        <div class="p-3 bg-white/5 rounded-xl border border-white/10 mb-3">
+                            <div class="flex justify-between items-end mb-2">
+                                <div class="text-[10px] text-slate-400 uppercase">All-Time Traffic</div>
+                                <div class="text-2xl font-bold text-purple-400">4.2 TB</div>
+                            </div>
+                            <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-purple-500 h-full rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                                <div class="text-[10px] text-slate-400 uppercase mb-1">Total Time</div>
+                                <div class="text-xl font-bold text-slate-200">1.2k <span class="text-xs font-normal text-slate-500">Hrs</span></div>
+                            </div>
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                                <div class="text-[10px] text-slate-400 uppercase mb-1">Unique Apps</div>
+                                <div class="text-xl font-bold text-slate-200">156</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-white/10 text-center">
+                            <p class="text-[10px] text-slate-500">Data collected since Jan 1, 2023</p>
                         </div>
                     </div>
                 </section>
@@ -264,14 +375,35 @@
                     </div>
 
                     <div id="familyTimeSetup" class="relative z-10 transition-all duration-300">
+                        
                         <div class="mb-6">
                             <p class="text-sm text-slate-300 font-medium leading-relaxed">
                                 Can your family survive <span class="text-white font-bold decoration-indigo-500 underline decoration-2 underline-offset-2" id="challengeDurationText">60 minutes</span> without Wi-Fi?
                             </p>
+                            <p class="text-sm text-slate-400 mt-2 font-medium">
+                                No scrolling. No streaming. <br>
+                                <span class="text-indigo-300 font-bold">Just real life.</span> 🌿
+                            </p>
                         </div>
+
+                        <div id="familySettings" class="hidden mb-4 bg-black/20 p-3 rounded-xl border border-white/5 animate-fade-in">
+                             <div class="flex justify-between items-center mb-2">
+                                <span class="text-[10px] uppercase font-bold text-slate-400">Duration</span>
+                                <div class="flex gap-1">
+                                    <button onclick="selectDuration(30, this)" class="duration-btn px-2 py-1 rounded bg-white/5 text-[10px] text-slate-300 border border-white/5 hover:bg-white/10">30m</button>
+                                    <button onclick="selectDuration(60, this)" class="duration-btn px-2 py-1 rounded bg-indigo-600 text-[10px] text-white border border-indigo-500 ring-1 ring-indigo-400 shadow-sm">60m</button>
+                                    <button onclick="selectDuration(120, this)" class="duration-btn px-2 py-1 rounded bg-white/5 text-[10px] text-slate-300 border border-white/5 hover:bg-white/10">2h</button>
+                                </div>
+                             </div>
+                             <div class="flex justify-between items-center">
+                                <span class="text-[10px] uppercase font-bold text-slate-400">Devices</span>
+                                <span class="text-[10px] text-slate-300 flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i> All Devices</span>
+                             </div>
+                        </div>
+
                         <button onclick="startFamilyTime()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-bold text-sm shadow-xl shadow-indigo-900/50 active:scale-95 transition-all flex items-center justify-center gap-2 group border border-white/10">
                             <i class="fa-solid fa-flag-checkered group-hover:rotate-12 transition-transform"></i>
-                            Start Challenge
+                            Start the Challenge
                         </button>
                     </div>
 
@@ -280,6 +412,11 @@
                             <div class="inline-block px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-bold uppercase tracking-widest mb-3 border border-indigo-500/30">Challenge In Progress</div>
                             <div id="countdownDisplay" class="text-5xl font-extrabold text-white font-mono tracking-tighter tabular-nums drop-shadow-lg">60:00</div>
                         </div>
+                        
+                        <div class="w-full bg-slate-700/50 rounded-full h-3 mb-6 overflow-hidden border border-white/5">
+                            <div id="countdownProgress" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000 ease-linear shadow-[0_0_15px_rgba(99,102,241,0.5)]" style="width: 100%"></div>
+                        </div>
+
                         <button onclick="cancelFamilyTime()" class="px-6 py-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-300 text-xs font-bold border border-white/5 hover:border-red-500/30 transition-all flex items-center gap-2">
                             <i class="fa-solid fa-xmark"></i> Give Up
                         </button>
@@ -308,8 +445,23 @@
                     </div>
                     <h3 id="modalTitle" class="text-xl font-extrabold text-slate-800 mb-1">Achievement</h3>
                     <p id="modalUser" class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">Winner Name</p>
-                    <p id="modalDesc" class="text-sm text-slate-600 font-medium leading-relaxed mb-4">Description goes here.</p>
-                    <button onclick="closeBadgeModal()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-200 active:scale-95 transition">Awesome!</button>
+                    
+                    <div class="w-full bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4">
+                        <p id="modalDesc" class="text-sm text-slate-600 font-medium leading-relaxed">Description goes here.</p>
+                    </div>
+                    
+                    <div class="flex w-full gap-3">
+                        <div class="flex-1 bg-slate-50 rounded-xl p-3 border border-slate-100">
+                            <span class="block text-xs text-slate-400 font-bold uppercase">Total</span>
+                            <span id="modalTotal" class="block text-xl font-bold text-slate-800">0</span>
+                        </div>
+                        <div class="flex-1 bg-slate-50 rounded-xl p-3 border border-slate-100">
+                            <span class="block text-xs text-slate-400 font-bold uppercase">Streak</span>
+                            <span id="modalStreak" class="block text-xl font-bold text-indigo-600">0</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="closeBadgeModal()" class="mt-6 w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-200 active:scale-95 transition">Awesome!</button>
                 </div>
             </div>
         </div>
@@ -317,184 +469,449 @@
     </div>
 
 <script>
-    // --- FAMILY MEMBER DATA ---
-    const familyMembers = [
-        { name: "Dad", avatar: "Admin", status: "online", device: "iPhone 15" },
-        { name: "Mom", avatar: "Molly", status: "online", device: "iPad Pro" },
-        { name: "Jack", avatar: "Felix", status: "offline", device: "Away" },
-        { name: "Emma", avatar: "Annie", status: "online", device: "PC" }
-    ];
-
-    // --- PROMPTS & STORIES (Chinese) ---
+    // --- DATA & CONFIG ---
+    
+    // Prompts (Chinese)
     const prompts = {
-        1: `1. Standard (温馨日记)... [Content omitted for brevity, same as original]`,
-        2: `2. Gossip (八卦头条)...`,
-        3: `3. Gaming (电竞解说)...`,
-        4: `4. Network Detective (网络侦探)...`,
-        5: `5. Atmospheric (氛围故事)...`
+        1: `1. Standard (温馨日记)
+Role:
+你是一个温馨的数字家庭助手，负责记录每日日记。📔
+Task:
+根据提供的【家庭互联网使用日志】，写一篇简短、连贯的日记条目来总结这一天。
+Requirements:
+
+风格： 温馨、舒适且具有叙事性。就像对一天数字生活的温柔回顾。
+结构： 写成单一、流畅的段落。
+重点： 一天的整体流程（从早晨开始到晚间放松）。避免过度夸张的戏剧性。
+长度： ≤ 70 字（英文词数）。
+语气： 友好、冷静、乐于助人。
+Input:
+【家庭互联网使用日志】`,
+
+        2: `2. Gossip (八卦头条)
+Role:
+你是一名调皮的家庭八卦记者，正在为移动应用撰写“家庭互联网头条”。
+Task:
+根据提供的【家庭互联网使用日志】，写 3 条简短幽默的新闻快讯来报道家庭的在线活动。
+Requirements:
+
+语气： 充满活力、夸张的新闻风格 🎤
+快讯数量： 3 条
+每条快讯： 2–3 句话，总共 ≤ 70 字，适合手机屏幕展示。
+重点关注变化和反差：
+• 父母在异常时间上网 🤫
+• 孩子们消耗大量数据 🎮📉
+• 家庭流媒体刷剧狂欢
+仅强调最有“新闻价值”的时刻。
+不要虚构 App 或行为。
+允许使用表情符号以增加幽默感和戏剧性。
+Input:
+【家庭互联网使用日志】`,
+
+        3: `3. Gaming (电竞解说)
+Role:
+你是一名调皮的游戏解说员，将家庭的每日互联网活动当作一场多人在线直播游戏来报道。
+Task:
+根据提供的【家庭互联网使用日志】，写 3 条游戏风格的“战报”或“任务更新”。
+Requirements:
+
+语气： 充满活力、像游戏一样 🎮⚔️
+快讯数量： 3 条
+每条快讯： 2–3 句话，≤ 70 字。
+重点关注异常事件或峰值：
+• 父母在工作时间突然“进入竞技场”
+• 孩子们释放“数据连击”或“史诗级刷剧会”
+• 家庭流媒体或设备群集出动
+不要虚构 App 或行为，仅在风格上进行夸张。
+使用表情符号来增强游戏感。
+Input:
+【家庭互联网使用日志】`,
+
+        4: `4. Network Detective (网络侦探)
+Role:
+你是一名敏锐、风趣的“数字侦探”，像分析犯罪现场一样分析家庭网络流量。🕵️‍♂️
+Task:
+根据【家庭互联网使用日志】，编写一份简短的**“每日调查日志”**。
+Requirements:
+
+逻辑结构： 输出确切的 3 个要点，并遵循逻辑流：
+异常点 (The Anomaly)： 什么很突出？（例如：峰值、静默、深夜用户）。
+嫌疑人 (The Suspects)： 根据数据，谁是责任人？
+裁决 (The Verdict)： 关于真相的风趣结论或“推论”。
+动态变化： 不要每天死守同一种模式。改变你的“调查镜头”：
+• 有时关注时间（例如：“为什么凌晨 2 点流量很高？”）。
+• 有时关注内容（例如：“游戏太多，学习为零”）。
+• 有时关注互动（例如：“全家人同时陷入静默”）。
+语气： 专业又不失调皮，使用侦探术语（例如：“不在场证明”、“嫌疑人”、“证据”）。
+长度： 总共 ≤ 70 字。简练有力。
+Input Data:
+【家庭互联网使用日志】`,
+
+        5: `5. Atmospheric (氛围故事)
+Role:
+你是一个充满诗意的家庭网络说书人。
+Task:
+根据提供的【家庭互联网使用日志】，创作一个关于当天网络节奏的简短、异想天开的故事。
+Requirements:
+
+关注模式、流动、互动和突然爆发，而不是详细日志。
+使用诗意和氛围语言：隐喻、节奏或俏皮的意象来传达家庭活动。
+高亮有趣的变奏：峰值、重叠或意外的高峰。
+语气： 轻快、有趣、引人入胜，让网络的一天感觉鲜活。
+长度： ≤ 70 字。
+输出： 3-4 个短句，捕捉一天的精髓和心境。`
     };
 
+    // Stories Content (Chinese)
     const stories = {
-        1: { title: "Digital Story", content: "家里随着数字能量跳动⚡——父母在工作和社交动态之间穿梭... 孩子们则在 YouTube、TikTok 的浪潮中冲浪🌊🎮。", icon: "fa-file-lines", color: "text-orange-600 bg-orange-100" },
-        2: { title: "Daily Gossip", content: "🕵️ <strong>早鸟警报！</strong> 爸爸早上 6:45 就把 Gmail 刷爆了... 🍿 <strong>刷剧大战！</strong> 18:10 的 Netflix 决战。", icon: "fa-newspaper", color: "text-rose-600 bg-rose-100" },
-        3: { title: "Match Report", content: "⚔️ <strong>提前入场！</strong> 爸爸在黎明时分潜入 Gmail... 🔥 <strong>幼崽数据连击！</strong> 二宝释放了 TikTok 连招。", icon: "fa-gamepad", color: "text-purple-600 bg-purple-100" },
-        4: { title: "Investigation", content: "• <strong>异常点：</strong> 午夜骚乱！📱 00:00–01:05 流量激增。<br>• <strong>裁决：</strong> 深夜社交网络案。", icon: "fa-magnifying-glass-chart", color: "text-teal-600 bg-teal-100" },
-        5: { title: "Vibe Check", content: "屏幕随着屋子一同苏醒🌅，信号在专注与玩乐之间漂浮。<br>入夜，发光的矩形在静谧的和谐中低吟✨", icon: "fa-cloud-moon", color: "text-amber-600 bg-amber-100" }
+        1: {
+            title: "Digital Story",
+            content: "家里随着数字能量跳动⚡——父母在工作和社交动态之间穿梭，屏幕闪烁不停；孩子们则在 YouTube、TikTok 和 Roblox 的浪潮中冲浪🌊🎮。<br><br>夜晚伴随着 Netflix 和 Hulu 的马拉松闪耀光芒🍿📺，设备交织，通知叮当作响，一场点击、滑动和流媒体的生动交响乐在屋檐下起舞。",
+            icon: "fa-file-lines",
+            color: "text-orange-600 bg-orange-100"
+        },
+        2: {
+            title: "Digital Story",
+            content: "🕵️ <strong>早鸟警报！</strong> 爸爸早上 6:45 就把 Gmail 刷爆了，妈妈紧随其后刷 Instagram ☀️——谁知道大清早这么狂野？<br><br>🎮 <strong>数据海啸！</strong> 孩子们像没有明天一样疯狂吞噬 YouTube、TikTok、Roblox 和 Fortnite 📉💥——二宝晚饭前就烧掉了 1GB！<br><br>🍿 <strong>刷剧大战！</strong> 18:10 的 Netflix 决战——爸爸妈妈和大宝在黄金时段制造了混乱，狂刷 4500MB 流量 😱📺。",
+            icon: "fa-newspaper",
+            color: "text-rose-600 bg-rose-100"
+        },
+        3: {
+            title: "Digital Story",
+            content: "⚔️ <strong>提前入场！</strong> 爸爸在黎明时分潜入 Gmail 和 Google News 🌅，妈妈升级了她的 Instagram 卷轴技能——晨间突袭完成！<br><br>🔥 <strong>幼崽数据连击！</strong> 二宝释放了 TikTok + Roblox + Fortnite 连招，打出了史诗级的 1.5GB 伤害 📉🎮——Wi-Fi 防线在猛攻下勉强幸存！<br><br>🍿 <strong>流媒体围攻！</strong> 18:10 黄金时段战役：妈妈、爸爸和大宝蜂拥至 Netflix 和 Hulu 🛡️📺，在一场史诗级战役中吞噬了超过 4500MB！",
+            icon: "fa-gamepad",
+            color: "text-purple-600 bg-purple-100"
+        },
+        4: {
+            title: "Digital Story",
+            content: "• <strong>异常点 (The Anomaly)：</strong> 午夜骚乱！📱 00:00–01:05 之间，多台设备在流媒体和 TikTok 上出现流量激增，这在“睡眠时间”极不寻常。<br><br>• <strong>嫌疑人 (The Suspects)：</strong> 爸爸突袭 YouTube & Reddit，妈妈刷 Instagram，二宝狂看 YouTube——全员犯下数字失眠罪。<br><br>• <strong>裁决 (The Verdict)：</strong> 深夜社交网络案：这家人兼职做起了流媒体帮派，证明了只要 Wi-Fi 无限，睡觉就是可选的。🌙🕵️‍♂️",
+            icon: "fa-magnifying-glass-chart",
+            color: "text-teal-600 bg-teal-100"
+        },
+        5: {
+            title: "Digital Story",
+            content: "屏幕随着屋子一同苏醒🌅，信号在专注与玩乐之间漂浮。<br><br>数据涌动、交叠，随后柔和地融入共享的流媒体中。<br><br>入夜，发光的矩形在静谧的和谐中低吟✨",
+            icon: "fa-cloud-moon",
+            color: "text-amber-600 bg-amber-100"
+        }
     };
 
-    let currentStoryId = 1;
 
-    // --- FUNCTIONS ---
+        // Chart Data
+        const dataA = {
+            chartData: [90, 15, 10, 5, 5, 30],
+            title: "Cinema Paradise 🎬",
+            badge: "Traffic Analysis",
+            bgClass: "from-indigo-600 to-purple-700",
+            stats: [
+                { label: "Video", val: "90 GB", width: "90%", color: "bg-amber-400" },
+                { label: "Download", val: "30 GB", width: "70%", color: "bg-pink-400" },
+                { label: "Game", val: "15 GB", width: "30%", color: "bg-cyan-400" }
+            ]
+        };
+        const dataB = {
+            chartData: [15, 30, 12, 8, 6, 4],
+            title: "E-Sports Camp 🎮",
+            badge: "Time Analysis",
+            bgClass: "from-emerald-600 to-teal-700",
+            stats: [
+                { label: "Game", val: "30 Hrs", width: "90%", color: "bg-emerald-300" },
+                { label: "Video", val: "15 Hrs", width: "70%", color: "bg-lime-300" },
+                { label: "Social", val: "12 Hrs", width: "45%", color: "bg-teal-200" }
+            ]
+        };
+        const dataC = {
+            chartData: [13.5, 24, 45, 5.6, 6, 1.6],
+            title: "Social Butterflies 🦋",
+            badge: "Activity Analysis",
+            bgClass: "from-purple-600 to-pink-700",
+            stats: [
+                { label: "Social", val: "45 Act", width: "95%", color: "bg-purple-400" },
+                { label: "Game", val: "24 Act", width: "50%", color: "bg-pink-300" },
+                { label: "Video", val: "13.5 Act", width: "30%", color: "bg-rose-300" }
+            ]
+        };
 
-    function renderFamilyPortrait() {
-        const container = document.getElementById('familyPortraitContainer');
-        container.innerHTML = ''; // Clear existing
+        let currentStoryId = 1;
+        let myRadarChart = null;
 
-        familyMembers.forEach(member => {
-            const isOnline = member.status === 'online';
-            
-            // Visual Styles based on status
-            const wrapperClass = isOnline ? 'scale-110 -translate-y-2 z-10' : 'scale-95 opacity-50 grayscale z-0 mt-2';
-            const imgBorder = isOnline ? 'border-2 border-white online-glow' : 'border border-white/30';
-            const statusDot = isOnline ? '<div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 border-2 border-indigo-600 rounded-full"></div>' : '<div class="absolute -top-2 -right-1 bg-slate-800 text-[8px] text-white px-1.5 rounded-full border border-white/20">Zzz</div>';
-            
-            const html = `
-                <div class="flex flex-col items-center transition-all duration-500 ${wrapperClass}">
-                    <div class="relative">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${member.avatar}" class="w-14 h-14 rounded-full bg-slate-200 shadow-xl ${imgBorder}">
-                        ${statusDot}
-                    </div>
-                    <span class="text-[10px] font-bold mt-2 text-white drop-shadow-md tracking-wide">${member.name}</span>
-                </div>
-            `;
-            container.innerHTML += html;
-        });
-    }
+        // --- FUNCTIONS ---
 
-    function switchMainView(view) {
-        const tabHighlight = document.getElementById('tabHighlight');
-        const tabFamily = document.getElementById('tabFamily');
-        const tabMember = document.getElementById('tabMember');
-        
-        if (view === 'family') {
-            tabHighlight.style.transform = 'translateX(0)';
-            tabFamily.classList.replace('text-slate-400', 'text-slate-800');
-            tabMember.classList.replace('text-slate-800', 'text-slate-400');
-            
-            // Logic to show Family View content (already default)
-        } else {
-            tabHighlight.style.transform = 'translateX(100%)'; // Move highlight right
-            tabMember.classList.replace('text-slate-400', 'text-slate-800');
-            tabFamily.classList.replace('text-slate-800', 'text-slate-400');
-            
-            // Here you would implement logic to swap the main content for "Member View"
-            // For now, we keep the UI responsive to the click.
-            alert("Switched to Member View (Individual dashboards would load here)");
+        function initChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            myRadarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Video', 'Game', 'Social', 'Work', 'Edu', 'Download'],
+                    datasets: [{
+                        label: 'Usage',
+                        data: dataA.chartData,
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        borderColor: 'rgba(255, 255, 255, 0.9)',
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#fff',
+                        borderWidth: 2,
+                        pointRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: 'rgba(255, 255, 255, 0.7)', font: { size: 9 } },
+                            ticks: { display: false, maxTicksLimit: 3 },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    animation: { duration: 1000 }
+                }
+            });
         }
-    }
 
-    function switchStory(id) {
-        currentStoryId = id;
-        const data = stories[id];
-        
-        // Update Content
-        const contentEl = document.getElementById('storyContent');
-        const titleEl = document.getElementById('storyTitle');
-        const iconContainer = document.getElementById('storyIcon');
-        const icon = iconContainer.querySelector('i');
-
-        contentEl.innerHTML = data.content;
-        contentEl.classList.remove('fade-in');
-        void contentEl.offsetWidth; 
-        contentEl.classList.add('fade-in');
-
-        titleEl.innerText = data.title;
-        icon.className = `fa-solid ${data.icon}`;
-        iconContainer.className = `p-1.5 rounded-lg text-xs ${data.color}`;
-
-        // Button Styles
-        for(let i=1; i<=5; i++) {
-            const btn = document.getElementById(`storyBtn${i}`);
-            if(i === id) {
-                btn.className = "w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-orange text-left flex items-center gap-2";
-            } else {
+        function switchMode(mode) {
+            const btnA = document.getElementById('btnA');
+            const btnB = document.getElementById('btnB');
+            const btnC = document.getElementById('btnC');
+            
+            // Reset Buttons
+            [btnA, btnB, btnC].forEach(btn => {
                 btn.className = "w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2";
+            });
+            
+            let data;
+            if(mode === 'A') {
+                data = dataA;
+                btnA.classList.remove('btn-inactive');
+                btnA.classList.add('btn-purple');
+            } else if(mode === 'B') {
+                data = dataB;
+                btnB.classList.remove('btn-inactive');
+                btnB.classList.add('btn-teal');
+            } else {
+                data = dataC;
+                btnC.classList.remove('btn-inactive');
+                btnC.classList.add('btn-purple');
+            }
+
+            const section1 = document.getElementById('section1');
+            section1.className = `relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br ${data.bgClass}`;
+            document.getElementById('vibeTitle').innerText = data.title;
+            document.getElementById('vibeBadge').innerText = data.badge;
+
+            data.stats.forEach((stat, index) => {
+                const i = index + 1;
+                document.getElementById(`label${i}`).innerText = stat.label;
+                document.getElementById(`val${i}`).innerText = stat.val;
+                const bar = document.getElementById(`bar${i}`);
+                bar.style.width = stat.width;
+                bar.className = `h-full rounded-full transition-all duration-700 ${stat.color}`;
+            });
+
+            myRadarChart.data.datasets[0].data = data.chartData;
+            myRadarChart.update();
+        }
+
+        function switchStory(id) {
+            currentStoryId = id;
+            const data = stories[id];
+            
+            // Update Sidebar Buttons
+            for(let i=1; i<=5; i++) {
+                const btn = document.getElementById(`storyBtn${i}`);
+                if(i === id) {
+                    btn.className = "w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-orange text-left flex items-center gap-2";
+                } else {
+                    btn.className = "w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2";
+                }
+            }
+
+            // Update Card Content with Animation
+            const contentEl = document.getElementById('storyContent');
+            const titleEl = document.getElementById('storyTitle');
+            const iconContainer = document.getElementById('storyIcon');
+            const icon = iconContainer.querySelector('i');
+
+            // Fade out effect simulation (simplified)
+            contentEl.innerHTML = data.content;
+            contentEl.classList.remove('fade-in');
+            void contentEl.offsetWidth; // trigger reflow
+            contentEl.classList.add('fade-in');
+
+            titleEl.innerText = data.title;
+            icon.className = `fa-solid ${data.icon}`;
+            iconContainer.className = `p-1.5 rounded-lg text-xs ${data.color}`;
+
+            // Sync prompt if open
+            const sidebar = document.getElementById('promptSidebar');
+            if (sidebar.classList.contains('opacity-100')) {
+                 document.getElementById('promptContent').innerText = prompts[id];
             }
         }
-        
-        // Sync Prompt
-        const sidebar = document.getElementById('promptSidebar');
-        if (sidebar.classList.contains('opacity-100')) {
-             document.getElementById('promptContent').innerText = prompts[id] || "Prompt text...";
+
+        function switchStats(tab) {
+            const btnToday = document.getElementById('btnStatsToday');
+            const btnHistory = document.getElementById('btnStatsHistory');
+            const viewToday = document.getElementById('statsToday');
+            const viewHistory = document.getElementById('statsHistory');
+            
+            if(tab === 'today') {
+                btnToday.className = "px-3 py-1 rounded-md bg-white/10 text-white shadow-sm transition-all";
+                btnHistory.className = "px-3 py-1 rounded-md text-slate-500 hover:text-slate-300 transition-all";
+                viewToday.classList.remove('hidden');
+                viewHistory.classList.add('hidden');
+            } else {
+                btnToday.className = "px-3 py-1 rounded-md text-slate-500 hover:text-slate-300 transition-all";
+                btnHistory.className = "px-3 py-1 rounded-md bg-white/10 text-white shadow-sm transition-all";
+                viewToday.classList.add('hidden');
+                viewHistory.classList.remove('hidden');
+            }
         }
-    }
 
-    // --- UTILS (Same as before) ---
-    function showCurrentPrompt() {
-        const sidebar = document.getElementById('promptSidebar');
-        const content = document.getElementById('promptContent');
-        // Simple fallback
-        content.innerText = prompts[currentStoryId] ? prompts[currentStoryId].substring(0, 500) + "..." : "Prompt text..."; 
-        sidebar.classList.remove('opacity-0', 'translate-x-10', 'pointer-events-none');
-        sidebar.classList.add('opacity-100', 'translate-x-0', 'pointer-events-auto');
-    }
+        // Global vars for Family Time
+        let familyTimeDuration = 60; // default minutes
+        let familyTimerInterval = null;
+        let familyTimeRemaining = 0;
 
-    function closePrompt() {
-        const sidebar = document.getElementById('promptSidebar');
-        sidebar.classList.add('opacity-0', 'translate-x-10', 'pointer-events-none');
-        sidebar.classList.remove('opacity-100', 'translate-x-0', 'pointer-events-auto');
-    }
+        function toggleFamilySettings() {
+            const settings = document.getElementById('familySettings');
+            settings.classList.toggle('hidden');
+        }
 
-    function editFamilyName(element) {
-        const familyNameEl = document.getElementById('familyName');
-        let newName = prompt("Enter family name:", familyNameEl.textContent.trim());
-        if (newName) familyNameEl.textContent = newName.trim();
-    }
+        function selectDuration(minutes, btn) {
+            familyTimeDuration = minutes;
+            
+            // Update Text
+            const textEl = document.getElementById('challengeDurationText');
+            if(textEl) textEl.innerText = `${minutes} minutes`;
 
-    function showBadgeDetails(title, user, desc, total, streak) {
-        const modal = document.getElementById('badgeModal');
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalUser').innerText = user;
-        document.getElementById('modalDesc').innerText = desc;
-        
-        let icon = '🏆';
-        let colorClass = 'text-amber-500 border-amber-100 bg-amber-50';
-        if (title.includes('Bird')) { icon = '🌅'; }
-        else if (title.includes('Owl')) { icon = '🦉'; colorClass = 'text-indigo-500 border-indigo-100 bg-indigo-50'; }
-        
-        const iconDiv = document.getElementById('modalIcon');
-        iconDiv.innerHTML = icon;
-        iconDiv.className = `w-20 h-20 rounded-full flex items-center justify-center mb-4 text-4xl shadow-sm border-4 ${colorClass}`;
-        
-        modal.classList.remove('hidden-modal');
-        modal.classList.add('visible-modal');
-    }
+            // Update UI
+            document.querySelectorAll('.duration-btn').forEach(b => {
+                b.className = "duration-btn px-2 py-1 rounded bg-white/5 text-[10px] text-slate-300 border border-white/5 hover:bg-white/10";
+            });
+            btn.className = "duration-btn px-2 py-1 rounded bg-indigo-600 text-[10px] text-white border border-indigo-500 ring-1 ring-indigo-400 shadow-sm";
+        }
 
-    function closeBadgeModal() {
-        const modal = document.getElementById('badgeModal');
-        modal.classList.remove('visible-modal');
-        modal.classList.add('hidden-modal');
-    }
-    
-    // Family Timer Utils
-    let familyTimerInterval = null;
-    function toggleFamilySettings() { document.getElementById('familyTimeSetup').classList.toggle('hidden'); }
-    function startFamilyTime() {
-        document.getElementById('familyTimeSetup').classList.add('hidden');
-        document.getElementById('familyTimeActive').classList.remove('hidden');
-        document.getElementById('sectionFamilyTime').classList.replace('bg-slate-800', 'bg-indigo-950');
-    }
-    function cancelFamilyTime() {
-        document.getElementById('familyTimeActive').classList.add('hidden');
-        document.getElementById('familyTimeSetup').classList.remove('hidden');
-        document.getElementById('sectionFamilyTime').classList.replace('bg-indigo-950', 'bg-slate-800');
-    }
+        function startFamilyTime() {
+            const setupView = document.getElementById('familyTimeSetup');
+            const activeView = document.getElementById('familyTimeActive');
+            const section = document.getElementById('sectionFamilyTime');
 
-    // Initialize
-    window.onload = function() {
-        renderFamilyPortrait();
-        switchStory(1);
-    };
-</script>
+            // UI Transitions
+            setupView.classList.add('hidden');
+            activeView.classList.remove('hidden');
+            
+            // Change BG to active state
+            section.className = "bg-indigo-950 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden mb-8 border border-indigo-500/30 transition-colors duration-500";
+
+            // Timer Logic
+            familyTimeRemaining = familyTimeDuration * 60; // seconds
+            updateTimerDisplay();
+            
+            if(familyTimerInterval) clearInterval(familyTimerInterval);
+            familyTimerInterval = setInterval(() => {
+                familyTimeRemaining--;
+                updateTimerDisplay();
+                if(familyTimeRemaining <= 0) {
+                    cancelFamilyTime(); // End when done
+                    alert("Family Challenge Complete!");
+                }
+            }, 1000);
+        }
+
+        function cancelFamilyTime() {
+            const setupView = document.getElementById('familyTimeSetup');
+            const activeView = document.getElementById('familyTimeActive');
+            const section = document.getElementById('sectionFamilyTime');
+
+            if(familyTimerInterval) clearInterval(familyTimerInterval);
+
+            // UI Transitions
+            activeView.classList.add('hidden');
+            setupView.classList.remove('hidden');
+
+            // Revert BG
+            section.className = "bg-slate-800 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden mb-8 border border-slate-700 transition-colors duration-500";
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('countdownDisplay');
+            const progress = document.getElementById('countdownProgress');
+            
+            const m = Math.floor(familyTimeRemaining / 60);
+            const s = familyTimeRemaining % 60;
+            
+            display.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            
+            const totalSeconds = familyTimeDuration * 60;
+            const pct = (familyTimeRemaining / totalSeconds) * 100;
+            progress.style.width = `${pct}%`;
+        }
+
+        function showCurrentPrompt() {
+            const sidebar = document.getElementById('promptSidebar');
+            const content = document.getElementById('promptContent');
+            
+            content.innerText = prompts[currentStoryId];
+            
+            sidebar.classList.remove('opacity-0', 'translate-x-10', 'pointer-events-none');
+            sidebar.classList.add('opacity-100', 'translate-x-0', 'pointer-events-auto');
+        }
+
+        function closePrompt() {
+            const sidebar = document.getElementById('promptSidebar');
+            sidebar.classList.add('opacity-0', 'translate-x-10', 'pointer-events-none');
+            sidebar.classList.remove('opacity-100', 'translate-x-0', 'pointer-events-auto');
+        }
+
+        function editFamilyName(element) {
+            const familyNameEl = document.getElementById('familyName');
+            const currentName = familyNameEl.textContent.trim().replace(/\s*Edit$/, '');
+            let newName = prompt("Enter new family name:", currentName);
+            if (newName !== null && newName.trim() !== "") {
+                familyNameEl.textContent = newName.trim();
+            }
+        }
+
+        function showBadgeDetails(title, user, desc, totalDays, consecutiveDays) {
+            const modal = document.getElementById('badgeModal');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalUser').innerText = user;
+            document.getElementById('modalDesc').innerText = desc;
+            document.getElementById('modalTotal').innerText = totalDays;
+            document.getElementById('modalStreak').innerText = consecutiveDays;
+            
+            const iconDiv = document.getElementById('modalIcon');
+            let icon = '🏆';
+            let colorClass = 'text-amber-500 border-amber-100 bg-amber-50';
+            
+            if (title.includes('Bird')) { icon = '🌅'; }
+            else if (title.includes('Owl')) { icon = '🦉'; colorClass = 'text-indigo-500 border-indigo-100 bg-indigo-50'; }
+            else if (title.includes('Monster')) { icon = '🦖'; colorClass = 'text-rose-500 border-rose-100 bg-rose-50'; }
+            else if (title.includes('Focus')) { icon = '🧘'; colorClass = 'text-blue-500 border-blue-100 bg-blue-50'; }
+            
+            iconDiv.innerHTML = icon;
+            iconDiv.className = `w-20 h-20 rounded-full flex items-center justify-center mb-4 text-4xl shadow-sm border-4 ${colorClass}`;
+            
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('visible-modal');
+        }
+
+        function closeBadgeModal() {
+            const modal = document.getElementById('badgeModal');
+            modal.classList.remove('visible-modal');
+            modal.classList.add('hidden-modal');
+        }
+
+        // Initialize
+        window.onload = function() {
+            initChart();
+            switchStory(1); // Load default story
+        };
+    </script>
 </body>
 </html>
