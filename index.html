@@ -7,10 +7,70 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #e2e8f0; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom buttons */
+        .btn-purple {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(124, 58, 237, 0.3);
+        }
+        .btn-teal {
+            background: linear-gradient(135deg, #0d9488, #0f766e);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3);
+        }
+        .btn-orange {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.3);
+        }
+        .btn-inactive {
+            background: white;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+        }
+        .btn-inactive:hover { background: #f9fafb; }
+        
+        .editable:hover .edit-icon { opacity: 1; }
+        .edit-icon { opacity: 0; transition: opacity 0.2s; margin-left: 4px; cursor: pointer; }
+
+        /* Animation for Prompt Sidebar */
+        #promptSidebar {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Modal Animation */
+        #badgeModal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #badgeModal.hidden-modal {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+        #badgeModal.visible-modal {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+        
+        /* Fade transition for story content */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body class="flex items-center justify-center min-h-screen py-10 relative overflow-x-hidden">
 
@@ -25,9 +85,6 @@
             </button>
             <button onclick="switchMode('C')" id="btnC" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
                 <i class="fa-solid fa-bolt w-4"></i> Plan C: Active (活跃)
-            </button>
-            <button onclick="switchMode('D')" id="btnD" class="w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2">
-                <i class="fa-solid fa-users w-4"></i> Plan D: Family Photo (全家福)
             </button>
         </div>
 
@@ -87,30 +144,6 @@
 
         <div id="homeView" class="flex flex-col h-full w-full absolute top-0 left-0 pt-[44px] transition-transform duration-300 ease-in-out bg-slate-50">
             
-            <!-- View Tabs -->
-            <div class="px-6 pt-3 pb-2 bg-slate-50 shrink-0">
-                <div class="flex gap-2 bg-slate-100 p-1 rounded-xl">
-                    <button onclick="switchView('family')" id="tabFamily" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all bg-white text-slate-800 shadow-sm">
-                        <i class="fa-solid fa-users mr-1"></i> Family
-                    </button>
-                    <button onclick="switchView('dad')" id="tabDad" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-800">
-                        <i class="fa-solid fa-user mr-1"></i> Dad
-                    </button>
-                    <button onclick="switchView('mom')" id="tabMom" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-800">
-                        <i class="fa-solid fa-user mr-1"></i> Mom
-                    </button>
-                    <button onclick="switchView('jack')" id="tabJack" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-800">
-                        <i class="fa-solid fa-user mr-1"></i> Jack
-                    </button>
-                    <button onclick="switchView('emma')" id="tabEmma" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-800">
-                        <i class="fa-solid fa-user mr-1"></i> Emma
-                    </button>
-                    <button onclick="switchView('kevin')" id="tabKevin" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-800">
-                        <i class="fa-solid fa-user mr-1"></i> Kevin
-                    </button>
-                </div>
-            </div>
-            
             <header class="px-6 py-2 pb-4 bg-slate-50 flex justify-between items-center shrink-0">
                 <div class="editable" onclick="editFamilyName(this)">
                     <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Family Insight</div>
@@ -138,112 +171,23 @@
                             </div>
                             <span id="vibeBadge" class="bg-white/20 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold border border-white/10">Traffic Analysis</span>
                         </div>
-                        <!-- Chart View (for modes A, B, C) -->
-                        <div id="chartView" class="mt-2">
-                            <div class="flex items-center mb-3">
-                                <div class="w-[180px] h-[180px] relative -ml-2">
-                                    <canvas id="radarChart"></canvas>
-                                </div>
-                                <div class="flex-1 pl-2 space-y-3">
-                                    <div class="group">
-                                        <div class="flex justify-between text-xs text-indigo-100 mb-0.5"><span id="label1">Video</span><span id="val1" class="font-bold text-white">90 GB</span></div>
-                                        <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden"><div id="bar1" class="h-full bg-amber-400 rounded-full" style="width: 90%"></div></div>
-                                    </div>
-                                    <div class="group">
-                                        <div class="flex justify-between text-xs text-indigo-100 mb-0.5"><span id="label2">Download</span><span id="val2" class="font-bold text-white">30 GB</span></div>
-                                        <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden"><div id="bar2" class="h-full bg-pink-400 rounded-full" style="width: 70%"></div></div>
-                                    </div>
-                                    <div class="group">
-                                        <div class="flex justify-between text-xs text-indigo-100 mb-0.5"><span id="label3">Game</span><span id="val3" class="font-bold text-white">15 GB</span></div>
-                                        <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden"><div id="bar3" class="h-full bg-cyan-400 rounded-full" style="width: 30%"></div></div>
-                                    </div>
-                                </div>
+                        <div class="flex items-center mt-2">
+                            <div class="w-[180px] h-[180px] relative -ml-2">
+                                <canvas id="radarChart"></canvas>
                             </div>
-                            <!-- Family Portrait in Chart View -->
-                            <div id="familyPortraitInChart" class="mt-3 pt-3 border-t border-white/20">
-                                <div class="flex flex-wrap justify-center items-center gap-2">
-                                    <div class="flex flex-col items-center">
-                                        <div class="relative">
-                                            <img id="chartAvatarDad" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="Dad" class="w-12 h-12 rounded-full border-2 border-white/50 shadow-md transition-all duration-300">
-                                            <div id="chartStatusDad" class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
-                                        </div>
-                                        <span class="text-[9px] text-indigo-100 mt-0.5 font-medium">Dad</span>
-                                    </div>
-                                    <div class="flex flex-col items-center">
-                                        <div class="relative">
-                                            <img id="chartAvatarMom" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Molly" alt="Mom" class="w-12 h-12 rounded-full border-2 border-white/50 shadow-md transition-all duration-300">
-                                            <div id="chartStatusMom" class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
-                                        </div>
-                                        <span class="text-[9px] text-indigo-100 mt-0.5 font-medium">Mom</span>
-                                    </div>
-                                    <div class="flex flex-col items-center">
-                                        <div class="relative">
-                                            <img id="chartAvatarJack" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" alt="Jack" class="w-12 h-12 rounded-full border-2 border-white/50 shadow-md transition-all duration-300">
-                                            <div id="chartStatusJack" class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
-                                        </div>
-                                        <span class="text-[9px] text-indigo-100 mt-0.5 font-medium">Jack</span>
-                                    </div>
-                                    <div class="flex flex-col items-center">
-                                        <div class="relative">
-                                            <img id="chartAvatarEmma" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Emma" alt="Emma" class="w-12 h-12 rounded-full border-2 border-white/50 shadow-md transition-all duration-300 opacity-50 grayscale">
-                                            <div id="chartStatusEmma" class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-slate-400 rounded-full border-2 border-white shadow-sm"></div>
-                                        </div>
-                                        <span class="text-[9px] text-indigo-100 mt-0.5 font-medium opacity-60">Emma</span>
-                                    </div>
-                                    <div class="flex flex-col items-center">
-                                        <div class="relative">
-                                            <img id="chartAvatarKevin" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin" alt="Kevin" class="w-12 h-12 rounded-full border-2 border-white/50 shadow-md transition-all duration-300">
-                                            <div id="chartStatusKevin" class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
-                                        </div>
-                                        <span class="text-[9px] text-indigo-100 mt-0.5 font-medium">Kevin</span>
-                                    </div>
+                            <div class="flex-1 pl-2 space-y-3">
+                                <div class="group">
+                                    <div class="flex justify-between text-xs text-indigo-100 mb-0.5"><span id="label1">Video</span><span id="val1" class="font-bold text-white">90 GB</span></div>
+                                    <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden"><div id="bar1" class="h-full bg-amber-400 rounded-full" style="width: 90%"></div></div>
                                 </div>
-                            </div>
-                        </div>
-                        <!-- Family Photo View (for mode D) -->
-                        <div id="familyPhotoView" class="hidden mt-4">
-                            <div class="text-center mb-3">
-                                <p class="text-indigo-200 text-xs font-medium mb-2">Family Portrait 👨‍👩‍👧‍👦</p>
-                            </div>
-                            <div class="flex flex-wrap justify-center items-center gap-3 px-2">
-                                <div class="flex flex-col items-center">
-                                    <div class="relative">
-                                        <img id="avatarDad" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="Dad" class="w-16 h-16 rounded-full border-3 border-white shadow-lg transition-all duration-300">
-                                        <div id="statusDad" class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow"></div>
-                                    </div>
-                                    <span class="text-[10px] text-indigo-100 mt-1 font-medium">Dad</span>
+                                <div class="group">
+                                    <div class="flex justify-between text-xs text-indigo-100 mb-0.5"><span id="label2">Download</span><span id="val2" class="font-bold text-white">30 GB</span></div>
+                                    <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden"><div id="bar2" class="h-full bg-pink-400 rounded-full" style="width: 70%"></div></div>
                                 </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="relative">
-                                        <img id="avatarMom" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Molly" alt="Mom" class="w-16 h-16 rounded-full border-3 border-white shadow-lg transition-all duration-300">
-                                        <div id="statusMom" class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow"></div>
-                                    </div>
-                                    <span class="text-[10px] text-indigo-100 mt-1 font-medium">Mom</span>
+                                <div class="group">
+                                    <div class="flex justify-between text-xs text-indigo-100 mb-0.5"><span id="label3">Game</span><span id="val3" class="font-bold text-white">15 GB</span></div>
+                                    <div class="w-full bg-black/20 h-1.5 rounded-full overflow-hidden"><div id="bar3" class="h-full bg-cyan-400 rounded-full" style="width: 30%"></div></div>
                                 </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="relative">
-                                        <img id="avatarJack" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" alt="Jack" class="w-16 h-16 rounded-full border-3 border-white shadow-lg transition-all duration-300">
-                                        <div id="statusJack" class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow"></div>
-                                    </div>
-                                    <span class="text-[10px] text-indigo-100 mt-1 font-medium">Jack</span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="relative">
-                                        <img id="avatarEmma" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Emma" alt="Emma" class="w-16 h-16 rounded-full border-3 border-white shadow-lg transition-all duration-300 opacity-50 grayscale">
-                                        <div id="statusEmma" class="absolute -bottom-1 -right-1 w-5 h-5 bg-slate-400 rounded-full border-2 border-white shadow"></div>
-                                    </div>
-                                    <span class="text-[10px] text-indigo-100 mt-1 font-medium opacity-60">Emma</span>
-                                </div>
-                                <div class="flex flex-col items-center">
-                                    <div class="relative">
-                                        <img id="avatarKevin" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin" alt="Kevin" class="w-16 h-16 rounded-full border-3 border-white shadow-lg transition-all duration-300">
-                                        <div id="statusKevin" class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow"></div>
-                                    </div>
-                                    <span class="text-[10px] text-indigo-100 mt-1 font-medium">Kevin</span>
-                                </div>
-                            </div>
-                            <div class="mt-4 text-center">
-                                <p class="text-xs text-indigo-200 font-medium">4 members online • 1 offline</p>
                             </div>
                         </div>
                     </div>
@@ -690,218 +634,8 @@ Requirements:
 
         let currentStoryId = 1;
         let myRadarChart = null;
-        let currentView = 'family'; // 'family', 'dad', 'mom', 'jack', 'emma', 'kevin'
-
-        // Family Members Data
-        const familyMembers = {
-            family: {
-                name: "The Millers",
-                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin",
-                online: true
-            },
-            dad: {
-                name: "Dad",
-                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin",
-                online: true,
-                data: {
-                    video: "45 GB",
-                    download: "15 GB",
-                    game: "5 GB",
-                    time: "8.5 Hrs",
-                    apps: 12
-                }
-            },
-            mom: {
-                name: "Mom",
-                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Molly",
-                online: true,
-                data: {
-                    video: "30 GB",
-                    download: "10 GB",
-                    game: "2 GB",
-                    time: "6.2 Hrs",
-                    apps: 15
-                }
-            },
-            jack: {
-                name: "Jack",
-                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack",
-                online: true,
-                data: {
-                    video: "25 GB",
-                    download: "8 GB",
-                    game: "35 GB",
-                    time: "12.5 Hrs",
-                    apps: 8
-                }
-            },
-            emma: {
-                name: "Emma",
-                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
-                online: false,
-                data: {
-                    video: "15 GB",
-                    download: "5 GB",
-                    game: "20 GB",
-                    time: "5.8 Hrs",
-                    apps: 10
-                }
-            },
-            kevin: {
-                name: "Kevin",
-                avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin",
-                online: true,
-                data: {
-                    video: "20 GB",
-                    download: "7 GB",
-                    game: "28 GB",
-                    time: "10.3 Hrs",
-                    apps: 9
-                }
-            }
-        };
 
         // --- FUNCTIONS ---
-
-        function switchView(view) {
-            currentView = view;
-            
-            // Update tab buttons
-            const tabs = ['family', 'dad', 'mom', 'jack', 'emma', 'kevin'];
-            tabs.forEach(tab => {
-                const btn = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
-                if (btn) {
-                    if (tab === view) {
-                        btn.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all bg-white text-slate-800 shadow-sm";
-                    } else {
-                        btn.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-800";
-                    }
-                }
-            });
-
-            // Update header
-            const member = familyMembers[view];
-            if (member) {
-                document.getElementById('familyName').textContent = member.name;
-                const headerAvatar = document.querySelector('header img');
-                if (headerAvatar) {
-                    headerAvatar.src = member.avatar;
-                }
-            }
-
-            // Update content based on view
-            if (view === 'family') {
-                // Show family view content - reset to default mode A
-                switchMode('A');
-                // Ensure family portrait is visible
-                const familyPortrait = document.getElementById('familyPortraitInChart');
-                if (familyPortrait) {
-                    familyPortrait.classList.remove('hidden');
-                }
-            } else {
-                // Show individual member view
-                updateMemberView(view);
-            }
-
-            // Update family portrait
-            updateFamilyPortrait();
-        }
-
-        function updateMemberView(memberId) {
-            const member = familyMembers[memberId];
-            if (!member) return;
-
-            // Update section1 with member data
-            const section1 = document.getElementById('section1');
-            section1.className = "relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br from-indigo-600 to-purple-700";
-            
-            document.getElementById('vibeTitle').innerText = `${member.name}'s Digital Vibe`;
-            document.getElementById('vibeBadge').innerText = "Personal Stats";
-
-            // Update stats based on member data
-            document.getElementById('label1').innerText = "Video";
-            document.getElementById('val1').innerText = member.data.video;
-            document.getElementById('bar1').style.width = "75%";
-            
-            document.getElementById('label2').innerText = "Download";
-            document.getElementById('val2').innerText = member.data.download;
-            document.getElementById('bar2').style.width = "50%";
-            
-            document.getElementById('label3').innerText = "Game";
-            document.getElementById('val3').innerText = member.data.game;
-            document.getElementById('bar3').style.width = "60%";
-
-            // Show chart view, hide family photo
-            document.getElementById('chartView').classList.remove('hidden');
-            document.getElementById('familyPhotoView').classList.add('hidden');
-            
-            // Hide family portrait in chart view for individual members
-            const familyPortrait = document.getElementById('familyPortraitInChart');
-            if (familyPortrait) {
-                familyPortrait.classList.add('hidden');
-            }
-
-            // Update chart with member data
-            if (myRadarChart) {
-                const memberData = [
-                    parseFloat(member.data.video),
-                    parseFloat(member.data.game),
-                    15,
-                    20,
-                    5,
-                    parseFloat(member.data.download)
-                ];
-                myRadarChart.data.datasets[0].data = memberData;
-                myRadarChart.update();
-            }
-        }
-
-        function updateFamilyPortrait() {
-            // Update family portrait in chart view
-            const members = ['dad', 'mom', 'jack', 'emma', 'kevin'];
-            members.forEach(memberId => {
-                const member = familyMembers[memberId];
-                const capitalized = memberId.charAt(0).toUpperCase() + memberId.slice(1);
-                const avatarEl = document.getElementById(`chartAvatar${capitalized}`);
-                const statusEl = document.getElementById(`chartStatus${capitalized}`);
-                
-                if (avatarEl && member) {
-                    if (member.online) {
-                        avatarEl.classList.remove('opacity-50', 'grayscale');
-                        statusEl.className = "absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-sm";
-                    } else {
-                        avatarEl.classList.add('opacity-50', 'grayscale');
-                        statusEl.className = "absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-slate-400 rounded-full border-2 border-white shadow-sm";
-                    }
-                }
-            });
-
-            // Update family photo view (for mode D)
-            members.forEach(memberId => {
-                const member = familyMembers[memberId];
-                const capitalized = memberId.charAt(0).toUpperCase() + memberId.slice(1);
-                const avatarEl = document.getElementById(`avatar${capitalized}`);
-                const statusEl = document.getElementById(`status${capitalized}`);
-                
-                if (avatarEl && member) {
-                    if (member.online) {
-                        avatarEl.classList.remove('opacity-50', 'grayscale');
-                        statusEl.className = "absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow";
-                    } else {
-                        avatarEl.classList.add('opacity-50', 'grayscale');
-                        statusEl.className = "absolute -bottom-1 -right-1 w-5 h-5 bg-slate-400 rounded-full border-2 border-white shadow";
-                    }
-                }
-            });
-
-            // Update online count
-            const onlineCount = members.filter(id => familyMembers[id].online).length;
-            const offlineCount = members.length - onlineCount;
-            const statusText = document.querySelector('#familyPhotoView .mt-4 p');
-            if (statusText) {
-                statusText.textContent = `${onlineCount} members online • ${offlineCount} offline`;
-            }
-        }
 
         function initChart() {
             const ctx = document.getElementById('radarChart').getContext('2d');
@@ -940,99 +674,46 @@ Requirements:
         }
 
         function switchMode(mode) {
-            // Only allow mode switching when in family view
-            if (currentView !== 'family') {
-                return;
-            }
-
             const btnA = document.getElementById('btnA');
             const btnB = document.getElementById('btnB');
             const btnC = document.getElementById('btnC');
-            const btnD = document.getElementById('btnD');
             
             // Reset Buttons
-            [btnA, btnB, btnC, btnD].forEach(btn => {
-                if (btn) {
-                    btn.className = "w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2";
-                }
+            [btnA, btnB, btnC].forEach(btn => {
+                btn.className = "w-full py-2 px-4 rounded-lg text-xs font-bold transition-all btn-inactive text-left flex items-center gap-2";
             });
             
-            const chartView = document.getElementById('chartView');
-            const familyPhotoView = document.getElementById('familyPhotoView');
-            
-            if (mode === 'D') {
-                // Family Photo Mode
-                if (btnD) {
-                    btnD.classList.remove('btn-inactive');
-                    btnD.classList.add('btn-purple');
-                }
-                
-                const section1 = document.getElementById('section1');
-                section1.className = "relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br from-rose-600 to-pink-700";
-                document.getElementById('vibeTitle').innerText = "Family Portrait 👨‍👩‍👧‍👦";
-                document.getElementById('vibeBadge').innerText = "Family Photo";
-                
-                // Show family photo, hide chart
-                if (chartView) chartView.classList.add('hidden');
-                if (familyPhotoView) {
-                    familyPhotoView.classList.remove('hidden');
-                    updateFamilyPortrait();
-                }
+            let data;
+            if(mode === 'A') {
+                data = dataA;
+                btnA.classList.remove('btn-inactive');
+                btnA.classList.add('btn-purple');
+            } else if(mode === 'B') {
+                data = dataB;
+                btnB.classList.remove('btn-inactive');
+                btnB.classList.add('btn-teal');
             } else {
-                // Chart modes (A, B, C)
-                let data;
-                if(mode === 'A') {
-                    data = dataA;
-                    if (btnA) {
-                        btnA.classList.remove('btn-inactive');
-                        btnA.classList.add('btn-purple');
-                    }
-                } else if(mode === 'B') {
-                    data = dataB;
-                    if (btnB) {
-                        btnB.classList.remove('btn-inactive');
-                        btnB.classList.add('btn-teal');
-                    }
-                } else {
-                    data = dataC;
-                    if (btnC) {
-                        btnC.classList.remove('btn-inactive');
-                        btnC.classList.add('btn-purple');
-                    }
-                }
-
-                const section1 = document.getElementById('section1');
-                section1.className = `relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br ${data.bgClass}`;
-                document.getElementById('vibeTitle').innerText = data.title;
-                document.getElementById('vibeBadge').innerText = data.badge;
-
-                data.stats.forEach((stat, index) => {
-                    const i = index + 1;
-                    document.getElementById(`label${i}`).innerText = stat.label;
-                    document.getElementById(`val${i}`).innerText = stat.val;
-                    const bar = document.getElementById(`bar${i}`);
-                    bar.style.width = stat.width;
-                    bar.className = `h-full rounded-full transition-all duration-700 ${stat.color}`;
-                });
-
-                // Show chart, hide family photo
-                if (chartView) chartView.classList.remove('hidden');
-                if (familyPhotoView) familyPhotoView.classList.add('hidden');
-
-                // Show family portrait in chart view for family view
-                const familyPortrait = document.getElementById('familyPortraitInChart');
-                if (familyPortrait && currentView === 'family') {
-                    familyPortrait.classList.remove('hidden');
-                }
-
-                if (myRadarChart) {
-                    myRadarChart.data.datasets[0].data = data.chartData;
-                    myRadarChart.update();
-                }
-
-                // Update family portrait
-                updateFamilyPortrait();
+                data = dataC;
+                btnC.classList.remove('btn-inactive');
+                btnC.classList.add('btn-purple');
             }
+
+            const section1 = document.getElementById('section1');
+            section1.className = `relative rounded-3xl p-5 text-white shadow-lg overflow-hidden transition-all duration-500 bg-gradient-to-br ${data.bgClass}`;
+            document.getElementById('vibeTitle').innerText = data.title;
+            document.getElementById('vibeBadge').innerText = data.badge;
+
+            data.stats.forEach((stat, index) => {
+                const i = index + 1;
+                document.getElementById(`label${i}`).innerText = stat.label;
+                document.getElementById(`val${i}`).innerText = stat.val;
+                const bar = document.getElementById(`bar${i}`);
+                bar.style.width = stat.width;
+                bar.className = `h-full rounded-full transition-all duration-700 ${stat.color}`;
+            });
+
+            myRadarChart.data.datasets[0].data = data.chartData;
+            myRadarChart.update();
         }
 
         function switchStory(id) {
@@ -1230,8 +911,6 @@ Requirements:
         window.onload = function() {
             initChart();
             switchStory(1); // Load default story
-            switchView('family'); // Initialize with family view
-            updateFamilyPortrait(); // Initialize family portrait status
         };
     </script>
 </body>
